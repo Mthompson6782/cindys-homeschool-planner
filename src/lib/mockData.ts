@@ -38,11 +38,34 @@ function generateCurriculum() {
   let idCounter = 1;
   
   // Base start date: July 18, 2026 (Today, for example purposes)
-  // We'll just generate from July 1st to August 30th to ensure we have coverage
+  // We'll just generate from July 1st to September 30th to ensure we have coverage for the 10 week plan
   let currentDate = new Date('2026-07-01T00:00:00');
-  const endDate = new Date('2026-08-30T00:00:00');
+  const endDate = new Date('2026-09-30T00:00:00');
 
-  let leoLessonNumber = 1;
+  let leoLessonIndex = 0;
+  const leoLessons = [
+    { title: "Intro to Prepositions", description: "Prepositions Definition & List, Object of the Preposition, Deleting Prepositional Phrases, Compound Object, Infinitive vs. Prepositional Phrase (Pages 1-16)" },
+    { title: "Advanced Prepositions & Direct Objects", description: "Prepositional Phrases in Imperative Sentences, Adverb vs. Preposition, Preposition Review, Direct Objects, Compound Direct Objects (Pages 17-37)" },
+    { title: "Verb Fundamentals", description: "Action Verbs, Linking Verbs, Helping Verbs, Verb Phrases, Regular & Irregular Verbs (Pages 38-58)" },
+    { title: "Confusing Verbs & Agreement", description: "Sit/Set, Rise/Raise, Lie/Lay, To Be & Linking, Subject-Verb Agreement (Pages 59-77)" },
+    { title: "Tenses & Transitive Verbs", description: "Present & Past, Future, Perfect, Progressive, Transitive vs. Intransitive & Indirect Objects (Pages 82-104)" },
+    { title: "Noun Basics", description: "Definition, Concrete/Abstract, Common/Proper, Determiners, Noun vs. Adjective/Verb (Pages 112-124)" },
+    { title: "Advanced Nouns", description: "Singular/Plural, Possessive, Appositives, Predicate Nominatives, Gerunds (Pages 125-139)" },
+    { title: "Interjections, Conjunctions & Adjectives", description: "Interjections, Conjunctions, Limiting/Descriptive Adjectives, Proper Adjectives, Predicate Adjectives (Pages 147-164)" },
+    { title: "Sentences & Clauses", description: "Degrees of Adjectives, Sentence Types, Fragments, Run-ons, Phrases vs. Clauses (Pages 165-184)" },
+    { title: "Adverb Basics", description: "How & Where, When, To What Extent, Adverb vs Preposition, Adverb vs Adjective (Pages 188-202)" },
+    { title: "Advanced Adverbs", description: "Good vs. Well, Double Negatives, Degrees of Adverbs, Review, Personal Pronouns (Pages 203-220)" },
+    { title: "Pronoun Cases", description: "Nominative, Objective, Direct vs Indirect, Possessive, Its/It's & You're/Your (Pages 221-233)" },
+    { title: "Pronoun Types", description: "There/Their/They're, Reflexive, Antecedents, Demonstrative, Interrogative (Pages 234-248)" },
+    { title: "Indefinite Pronouns & Review", description: "Indefinite Pronouns, Pronoun vs Adjective, Agreement, Pronoun Review Parts 1 & 2 (Pages 249-263)" },
+    { title: "Punctuation Part 1", description: "Periods, Commas in Series/Addresses, Commas in Quotes/Letters, Commas with Appositives/Clauses, Semicolons & Colons (Pages 264-278)" },
+    { title: "Punctuation Part 2", description: "Question Marks & Exclamation Points, Hyphens, Quotation Marks, Underlining Titles, Punctuation Review (Pages 279-290)" },
+    { title: "Capitalization Part 1", description: "First Words & Titles, Proper Nouns & Places, Historical Events & Documents, Organizations & Languages, Religions & Proper Adjectives (Pages 291-303)" },
+    { title: "Capitalization Part 2 & Letters", description: "Do Not Capitalize Rules, Capitalization Review, Friendly Letters, Envelopes, Business Letters (Pages 304-316)" },
+    { title: "Clauses Part 1", description: "Coordinate Clauses, Subordinate Clauses, Adverb Clauses, Adjective Clauses, Noun Clauses (Pages 317-326)" },
+    { title: "Clauses Part 2 & Final Review", description: "Essential vs Nonessential, Elliptical, Complex Sentences, Clauses Review, Final Course Assessment (Pages 327-330)" }
+  ];
+
   const genkiTopics = [
     "Greetings", "Numbers 1-10", "Numbers 11-100", "Time", "Telephone Numbers", 
     "Hiragana: a, i, u, e, o", "Hiragana: ka, ki, ku, ke, ko", 
@@ -59,19 +82,23 @@ function generateCurriculum() {
     const isWeekendDay = isWeekend(currentDate);
     const dateStr = format(currentDate, 'yyyy-MM-dd');
     const isBlackout = blackoutDates.includes(dateStr);
+    const dayOfWeek = currentDate.getDay(); // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
 
     // Skip weekends and blackout dates for assignments
     if (!isWeekendDay && !isBlackout) {
-      // Leo: Easy Grammar Plus
-      assignments.push({
-        id: idCounter++,
-        date: dateStr,
-        time: "09:00",
-        title: `Easy Grammar Plus: Lesson ${leoLessonNumber}`,
-        user: "leo",
-        description: `Work through Lesson ${leoLessonNumber} in the Wanda C. Phillips textbook.`
-      });
-      leoLessonNumber++;
+      
+      // Leo: Easy Grammar Plus - Schedule only on Mondays (1) and Wednesdays (3)
+      if ((dayOfWeek === 1 || dayOfWeek === 3) && leoLessonIndex < leoLessons.length) {
+        assignments.push({
+          id: idCounter++,
+          date: dateStr,
+          time: "09:00",
+          title: `Easy Grammar Plus: ${leoLessons[leoLessonIndex].title}`,
+          user: "leo",
+          description: leoLessons[leoLessonIndex].description
+        });
+        leoLessonIndex++;
+      }
 
       // Alex: Genki Third Edition (Until Aug 18th target)
       if (currentDate <= new Date('2026-08-18T00:00:00') && alexLessonIndex < genkiTopics.length) {
