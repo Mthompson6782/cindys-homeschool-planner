@@ -10,7 +10,7 @@ export default function AdminDashboard() {
     startDate: '',
     endDate: '',
     lessonsPerDay: '1',
-    skipWeekends: true,
+    pattern: 'everyday',
   });
 
   const handleGenerate = (e: React.FormEvent) => {
@@ -91,15 +91,17 @@ export default function AdminDashboard() {
                 />
               </div>
               <div className={styles.formGroup}>
-                <label style={{marginTop: '2.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer'}}>
-                  <input 
-                    type="checkbox" 
-                    checked={generatorState.skipWeekends}
-                    onChange={e => setGeneratorState({...generatorState, skipWeekends: e.target.checked})}
-                    style={{width: '20px', height: '20px', accentColor: 'var(--accent-leo)'}}
-                  />
-                  Skip Weekends
-                </label>
+                <label>Schedule Pattern</label>
+                <select 
+                  className={styles.select}
+                  value={generatorState.pattern}
+                  onChange={e => setGeneratorState({...generatorState, pattern: e.target.value})}
+                >
+                  <option value="everyday">Everyday (M-F)</option>
+                  <option value="m_w">M/W</option>
+                  <option value="t_th">T/Th</option>
+                  <option value="friday">Friday</option>
+                </select>
               </div>
             </div>
             
