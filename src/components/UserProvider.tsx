@@ -92,9 +92,13 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
     setAvatars(prev => ({ ...prev, [user]: base64Image }));
   };
 
-  // Prevent hydration mismatch by not rendering until mounted
+  // Prevent hydration mismatch by hiding until mounted, but still provide context for SSR
   if (!mounted) {
-    return <div style={{ visibility: 'hidden' }}>{children}</div>;
+    return (
+      <UserContext.Provider value={{ activeUser, setActiveUser, theme, setTheme, avatars, setAvatar: handleSetAvatar }}>
+        <div style={{ visibility: 'hidden' }}>{children}</div>
+      </UserContext.Provider>
+    );
   }
 
   return (
