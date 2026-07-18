@@ -135,7 +135,7 @@ export default function DailyPlanner({ params, searchParams }: { params: Promise
                 <button 
                   className={styles.actionButton} 
                   style={{ color: 'var(--accent-warning)', border: '1px solid var(--accent-warning)', background: 'transparent' }}
-                  onClick={() => removeTask(assignment.id)}
+                  onClick={() => removeTask(assignment.id!)}
                 >
                   Remove
                 </button>
