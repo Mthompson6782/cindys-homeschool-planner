@@ -4,8 +4,9 @@ import Link from "next/link";
 import { format, parseISO } from "date-fns";
 import styles from "./DailyPlanner.module.css";
 import { mockSchedule } from "@/lib/mockData";
-import { use, useState, useEffect } from "react";
+import { use, useState, useEffect, useCallback } from "react";
 import { useUserPreferences } from "@/components/UserProvider";
+import { supabase, Task } from "@/lib/supabase";
 
 // A selection of quotes requested by the user
 const quotes = [
@@ -27,15 +28,32 @@ export default function DailyPlanner({ params, searchParams }: { params: Promise
   // Use activeUser from context if it's a student, else fallback to URL param or 'all'
   const userFilter = activeUser !== 'admin' ? activeUser : (resolvedSearch.user || "all");
   
-  const [tasks, setTasks] = useState(mockSchedule);
+  const [tasks, setTasks] = useState<Task[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  // Sync state if mockSchedule changes (it won't in this static setup, but good practice)
+  const fetchTasks = useCallback(async () => {
+    setLoading(true);
+    const { data, error } = await supabase
+      .from('tasks')
+      .select('*')
+      .eq('date', dateStr);
+      
+    if (data) {
+      setTasks(data);
+    }
+    setLoading(false);
+  }, [dateStr]);
+
   useEffect(() => {
-    setTasks(mockSchedule);
-  }, []);
+    fetchTasks();
+  }, [fetchTasks]);
 
-  const removeTask = (taskId: string) => {
+  const removeTask = async (taskId: string) => {
+    // Optimistic UI update
     setTasks(prev => prev.filter(t => t.id !== taskId));
+    
+    // Delete from Supabase
+    await supabase.from('tasks').delete().eq('id', taskId);
   };
   
   let displayDate = "Unknown Date";
@@ -51,7 +69,7 @@ export default function DailyPlanner({ params, searchParams }: { params: Promise
   const dailyQuote = quotes[quoteIndex];
 
   const dayAssignments = tasks.filter(a => 
-    a.date === dateStr && (userFilter === "all" || a.user === userFilter)
+    (userFilter === "all" || a.user === userFilter)
   );
 
   let missionBlurb = "No specific mission parameters for today.";

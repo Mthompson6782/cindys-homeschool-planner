@@ -4,14 +4,17 @@ import { useState, useEffect } from "react";
 import { format, addMonths, subMonths, startOfMonth, endOfMonth, startOfWeek, endOfWeek, isSameMonth, isSameDay, addDays, parseISO } from "date-fns";
 import styles from "./Calendar.module.css";
 import { useRouter } from "next/navigation";
-import { mockSchedule as mockAssignments, blackoutDates } from "@/lib/mockData";
+import { blackoutDates } from "@/lib/mockData";
 import { useUserPreferences } from "./UserProvider";
+import { supabase, Task } from "@/lib/supabase";
 
 export default function Calendar() {
   const router = useRouter();
   const { activeUser } = useUserPreferences();
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState(new Date());
+  const [assignments, setAssignments] = useState<Task[]>([]);
+  const [loading, setLoading] = useState(true);
   
   // Default the filter to the active user (unless it's admin, then show all)
   const [filter, setFilter] = useState(activeUser === 'admin' ? 'all' : activeUser);
@@ -20,6 +23,23 @@ export default function Calendar() {
   useEffect(() => {
     setFilter(activeUser === 'admin' ? 'all' : activeUser);
   }, [activeUser]);
+
+  // Fetch tasks from Supabase
+  useEffect(() => {
+    const fetchTasks = async () => {
+      setLoading(true);
+      const { data, error } = await supabase
+        .from('tasks')
+        .select('*');
+      
+      if (data) {
+        setAssignments(data);
+      }
+      setLoading(false);
+    };
+
+    fetchTasks();
+  }, []);
 
   const nextMonth = () => setCurrentDate(addMonths(currentDate, 1));
   const prevMonth = () => setCurrentDate(subMonths(currentDate, 1));
@@ -46,7 +66,7 @@ export default function Calendar() {
       formattedDate = format(day, dateFormat);
       const cloneDay = day;
       
-      const dayAssignments = mockAssignments.filter(
+      const dayAssignments = assignments.filter(
         a => isSameDay(parseISO(a.date), cloneDay) && (filter === "all" || a.user === filter)
       );
       
