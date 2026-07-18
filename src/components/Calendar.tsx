@@ -1,16 +1,25 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { format, addMonths, subMonths, startOfMonth, endOfMonth, startOfWeek, endOfWeek, isSameMonth, isSameDay, addDays, parseISO } from "date-fns";
 import styles from "./Calendar.module.css";
 import { useRouter } from "next/navigation";
 import { mockSchedule as mockAssignments, blackoutDates } from "@/lib/mockData";
+import { useUserPreferences } from "./UserProvider";
 
 export default function Calendar() {
   const router = useRouter();
+  const { activeUser } = useUserPreferences();
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState(new Date());
-  const [filter, setFilter] = useState("all");
+  
+  // Default the filter to the active user (unless it's admin, then show all)
+  const [filter, setFilter] = useState(activeUser === 'admin' ? 'all' : activeUser);
+
+  // When activeUser changes, update the filter automatically
+  useEffect(() => {
+    setFilter(activeUser === 'admin' ? 'all' : activeUser);
+  }, [activeUser]);
 
   const nextMonth = () => setCurrentDate(addMonths(currentDate, 1));
   const prevMonth = () => setCurrentDate(subMonths(currentDate, 1));
