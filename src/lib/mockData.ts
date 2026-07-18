@@ -95,15 +95,7 @@ function generateCurriculum() {
         });
       }
       
-      // Cindy: Daily planning
-      assignments.push({
-        id: idCounter++,
-        date: dateStr,
-        time: "08:00",
-        title: `Review Lessons`,
-        user: "cindy",
-        description: `Review yesterday's work and prepare materials for today.`
-      });
+      // Cindy: Daily planning (Removed per request)
     }
 
     currentDate = addDays(currentDate, 1);
