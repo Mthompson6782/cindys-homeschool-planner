@@ -10,12 +10,14 @@ export default function AppLayoutWrapper({ children }: { children: React.ReactNo
   const pathname = usePathname();
   const [isFeedbackModalOpen, setIsFeedbackModalOpen] = useState(false);
   
-  // Hide sidebar on the daily planner view
+  // Hide sidebar on specific views
   const isDailyView = pathname?.startsWith("/day/");
+  const isAdminView = pathname?.startsWith("/admin");
+  const hideSidebar = isDailyView || isAdminView;
 
   return (
     <div className={styles.appContainer}>
-      {!isDailyView && (
+      {!hideSidebar && (
         <nav className={styles.sidebar}>
           <div className={styles.logo}>
             <h2>Home School</h2>
@@ -43,7 +45,7 @@ export default function AppLayoutWrapper({ children }: { children: React.ReactNo
           </ul>
         </nav>
       )}
-      <main className={styles.mainContent} style={isDailyView ? { padding: 0 } : {}}>
+      <main className={styles.mainContent} style={hideSidebar ? { padding: 0 } : {}}>
         {children}
       </main>
       
