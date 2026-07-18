@@ -178,3 +178,56 @@
   background: rgba(239, 68, 68, 0.1);
   border-color: rgba(239, 68, 68, 0.3);
 }
+
+/* --- Mobile Responsiveness --- */
+@media (max-width: 768px) {
+  .plannerContainer {
+    padding: 1rem;
+    border-radius: 0;
+    border: none;
+  }
+  
+  .headerContent h1 {
+    font-size: 1.5rem;
+  }
+  
+  .headerContent p {
+    font-size: 0.9rem;
+  }
+  
+  .quoteSection {
+    padding: 1rem;
+  }
+  
+  .quoteText {
+    font-size: 1rem;
+  }
+
+  .timeSlot {
+    flex-direction: column;
+  }
+  
+  .timeLabel {
+    width: 100%;
+    text-align: left;
+    border-right: none;
+    border-bottom: 1px dashed var(--border-dark);
+    padding: 0.5rem 1rem;
+    font-size: 0.85rem;
+  }
+  
+  .timeContent {
+    padding: 0.5rem 0;
+  }
+  
+  .assignmentCard {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+  
+  .assignmentActions {
+    width: 100%;
+    justify-content: flex-end;
+  }
+}
