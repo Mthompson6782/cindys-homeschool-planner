@@ -25,8 +25,8 @@ export default function DailyPlanner({ params, searchParams }: { params: Promise
   
   const dateStr = resolvedParams.date;
   
-  // Use activeUser from context if it's a student, else fallback to URL param or 'all'
-  const userFilter = activeUser !== 'admin' ? activeUser : (resolvedSearch.user || "all");
+  // Use explicit URL parameter if provided, otherwise fallback to activeUser context (or 'all' for admin)
+  const userFilter = resolvedSearch.user || (activeUser !== 'admin' ? activeUser : "all");
   
   const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(true);
