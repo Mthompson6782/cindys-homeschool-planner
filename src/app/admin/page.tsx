@@ -9,9 +9,9 @@ export default function AdminDashboard() {
   const [generatorState, setGeneratorState] = useState({
     user: 'leo',
     textbook: '',
+    description: '',
     startDate: '',
     endDate: '',
-    lessonsPerDay: '1',
     pattern: 'everyday',
   });
   
@@ -36,7 +36,6 @@ export default function AdminDashboard() {
     let currentDate = parseISO(generatorState.startDate);
     const endDate = parseISO(generatorState.endDate);
     
-    let lessonNumber = 1;
     const tasksToInsert = [];
     
     while (currentDate <= endDate) {
@@ -52,11 +51,10 @@ export default function AdminDashboard() {
         tasksToInsert.push({
           date: format(currentDate, 'yyyy-MM-dd'),
           time: "09:00",
-          title: `${generatorState.textbook}: Lesson ${lessonNumber}`,
+          title: generatorState.textbook,
           user: generatorState.user,
-          description: `Work through Lesson ${lessonNumber} in ${generatorState.textbook}.`
+          description: generatorState.description
         });
-        lessonNumber += parseInt(generatorState.lessonsPerDay) || 1;
       }
       
       currentDate = addDays(currentDate, 1);
@@ -67,7 +65,7 @@ export default function AdminDashboard() {
       if (error) alert("Error saving tasks: " + error.message);
       else {
         alert(`Successfully generated ${tasksToInsert.length} tasks!`);
-        setGeneratorState({ ...generatorState, textbook: '' });
+        setGeneratorState({ ...generatorState, textbook: '', description: '' });
       }
     } else {
       alert("No valid dates found in that range for the selected pattern.");
@@ -179,17 +177,43 @@ export default function AdminDashboard() {
                 </select>
               </div>
               <div className={styles.formGroup}>
-                <label>Textbook / Subject Name</label>
-                <input 
-                  type="text" 
-                  className={styles.input} 
-                  placeholder="e.g. Easy Grammar Plus" 
-                  value={generatorState.textbook}
-                  onChange={e => setGeneratorState({...generatorState, textbook: e.target.value})}
-                  required
+                <label>Schedule Pattern</label>
+                <select 
+                  className={styles.select}
+                  value={generatorState.pattern}
+                  onChange={e => setGeneratorState({...generatorState, pattern: e.target.value})}
                   disabled={loading}
-                />
+                >
+                  <option value="everyday">Everyday (M-F)</option>
+                  <option value="m_w">M/W</option>
+                  <option value="t_th">T/Th</option>
+                  <option value="friday">Friday</option>
+                </select>
               </div>
+            </div>
+
+            <div className={styles.formGroup}>
+              <label>Subject / Task Title</label>
+              <input 
+                type="text" 
+                className={styles.input} 
+                placeholder="e.g. Japanese" 
+                value={generatorState.textbook}
+                onChange={e => setGeneratorState({...generatorState, textbook: e.target.value})}
+                required
+                disabled={loading}
+              />
+            </div>
+            
+            <div className={styles.formGroup}>
+              <label>Details / Instructions</label>
+              <textarea 
+                className={styles.textarea} 
+                placeholder="e.g. Study Hiragana..."
+                value={generatorState.description}
+                onChange={e => setGeneratorState({...generatorState, description: e.target.value})}
+                disabled={loading}
+              ></textarea>
             </div>
             
             <div className={styles.splitRow}>
@@ -214,34 +238,6 @@ export default function AdminDashboard() {
                   required
                   disabled={loading}
                 />
-              </div>
-            </div>
-
-            <div className={styles.splitRow}>
-              <div className={styles.formGroup}>
-                <label>Lessons / Pages Per Day</label>
-                <input 
-                  type="number" 
-                  className={styles.input} 
-                  min="1" 
-                  value={generatorState.lessonsPerDay}
-                  onChange={e => setGeneratorState({...generatorState, lessonsPerDay: e.target.value})}
-                  disabled={loading}
-                />
-              </div>
-              <div className={styles.formGroup}>
-                <label>Schedule Pattern</label>
-                <select 
-                  className={styles.select}
-                  value={generatorState.pattern}
-                  onChange={e => setGeneratorState({...generatorState, pattern: e.target.value})}
-                  disabled={loading}
-                >
-                  <option value="everyday">Everyday (M-F)</option>
-                  <option value="m_w">M/W</option>
-                  <option value="t_th">T/Th</option>
-                  <option value="friday">Friday</option>
-                </select>
               </div>
             </div>
             
