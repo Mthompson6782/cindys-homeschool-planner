@@ -60,8 +60,7 @@ export default function AdminDashboard() {
       for (const session of uploadedJson.schedule) {
         const defaultTitle = uploadedJson.metadata?.title || "Assignment";
         const prefix = generatorState.textbook ? generatorState.textbook : defaultTitle;
-        const phaseTitle = session.phase ? `: ${session.phase}` : "";
-        const title = `${prefix}${phaseTitle}`;
+        const title = prefix;
         
         let desc = "";
         if (session.lessons && session.lessons.length > 0) {

@@ -72,23 +72,7 @@ export default function DailyPlanner({ params, searchParams }: { params: Promise
     (userFilter === "all" || a.user === userFilter)
   );
 
-  let missionBlurb = "No specific mission parameters for today.";
-  if (dayAssignments.length > 0) {
-    if (userFilter === "all") {
-      const leoTasks = dayAssignments.filter(a => a.user === "leo").map(a => a.title);
-      const alexTasks = dayAssignments.filter(a => a.user === "alex").map(a => a.title);
-      const parts = [];
-      if (leoTasks.length) parts.push(`Leo is working on ${leoTasks.join(" and ")}`);
-      if (alexTasks.length) parts.push(`Alex is focusing on ${alexTasks.join(" and ")}`);
-      if (parts.length) {
-        missionBlurb = parts.join(". ") + ". Ensure all tasks are completed before 3 PM.";
-      }
-    } else {
-      const tasksTitles = dayAssignments.map(a => a.title);
-      const name = userFilter.charAt(0).toUpperCase() + userFilter.slice(1);
-      missionBlurb = `${name}'s focus today is on ${tasksTitles.join(" and ")}. Ensure all tasks are completed before 3 PM.`;
-    }
-  }
+  // Removed mission blurb logic per user request
 
   return (
     <div className={styles.plannerContainer}>
@@ -107,10 +91,7 @@ export default function DailyPlanner({ params, searchParams }: { params: Promise
         <p className={styles.quoteAuthor}>— {dailyQuote.author}</p>
       </div>
 
-      <div className={styles.assignmentsBlurb}>
-        <h3>Today's Mission</h3>
-        <p>{missionBlurb}</p>
-      </div>
+
 
       <div className={styles.schedule}>
         {dayAssignments.length === 0 ? (
