@@ -15,6 +15,8 @@ export default function AdminDashboard() {
     pattern: 'everyday',
   });
   
+  const [uploadedJson, setUploadedJson] = useState<any>(null);
+  
   const [singleTask, setSingleTask] = useState({
     user: 'cindy',
     date: '',
@@ -29,35 +31,76 @@ export default function AdminDashboard() {
 
   const [loading, setLoading] = useState(false);
 
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) {
+      setUploadedJson(null);
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      try {
+        const json = JSON.parse(event.target?.result as string);
+        setUploadedJson(json);
+      } catch (err) {
+        alert("Invalid JSON file");
+        setUploadedJson(null);
+      }
+    };
+    reader.readAsText(file);
+  };
+
   const handleBulkGenerate = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     
-    let currentDate = parseISO(generatorState.startDate);
-    const endDate = parseISO(generatorState.endDate);
-    
     const tasksToInsert = [];
     
-    while (currentDate <= endDate) {
-      const dayOfWeek = getDay(currentDate); // 0 = Sun, 1 = Mon, etc.
-      
-      let shouldAdd = false;
-      if (generatorState.pattern === 'everyday' && !isWeekend(currentDate)) shouldAdd = true;
-      if (generatorState.pattern === 'm_w' && (dayOfWeek === 1 || dayOfWeek === 3)) shouldAdd = true;
-      if (generatorState.pattern === 't_th' && (dayOfWeek === 2 || dayOfWeek === 4)) shouldAdd = true;
-      if (generatorState.pattern === 'friday' && dayOfWeek === 5) shouldAdd = true;
-      
-      if (shouldAdd) {
+    if (uploadedJson && uploadedJson.schedule) {
+      for (const session of uploadedJson.schedule) {
+        const defaultTitle = uploadedJson.metadata?.title || "Assignment";
+        const prefix = generatorState.textbook ? generatorState.textbook : defaultTitle;
+        const phaseTitle = session.phase ? `: ${session.phase}` : "";
+        const title = `${prefix}${phaseTitle}`;
+        
+        let desc = "";
+        if (session.lessons && session.lessons.length > 0) {
+          desc = `Lessons: ${session.lessons.join(", ")}`;
+        }
+        
         tasksToInsert.push({
-          date: format(currentDate, 'yyyy-MM-dd'),
+          date: session.date,
           time: "09:00",
-          title: generatorState.textbook,
+          title: title,
           user: generatorState.user,
-          description: generatorState.description
+          description: desc
         });
       }
+    } else {
+      let currentDate = parseISO(generatorState.startDate);
+      const endDate = parseISO(generatorState.endDate);
       
-      currentDate = addDays(currentDate, 1);
+      while (currentDate <= endDate) {
+        const dayOfWeek = getDay(currentDate); // 0 = Sun, 1 = Mon, etc.
+        
+        let shouldAdd = false;
+        if (generatorState.pattern === 'everyday' && !isWeekend(currentDate)) shouldAdd = true;
+        if (generatorState.pattern === 'm_w' && (dayOfWeek === 1 || dayOfWeek === 3)) shouldAdd = true;
+        if (generatorState.pattern === 't_th' && (dayOfWeek === 2 || dayOfWeek === 4)) shouldAdd = true;
+        if (generatorState.pattern === 'friday' && dayOfWeek === 5) shouldAdd = true;
+        
+        if (shouldAdd) {
+          tasksToInsert.push({
+            date: format(currentDate, 'yyyy-MM-dd'),
+            time: "09:00",
+            title: generatorState.textbook,
+            user: generatorState.user,
+            description: generatorState.description
+          });
+        }
+        
+        currentDate = addDays(currentDate, 1);
+      }
     }
     
     if (tasksToInsert.length > 0) {
@@ -66,6 +109,7 @@ export default function AdminDashboard() {
       else {
         alert(`Successfully generated ${tasksToInsert.length} tasks!`);
         setGeneratorState({ ...generatorState, textbook: '', description: '' });
+        setUploadedJson(null);
       }
     } else {
       alert("No valid dates found in that range for the selected pattern.");
@@ -162,6 +206,18 @@ export default function AdminDashboard() {
         <section className={styles.card}>
           <h2>Bulk Pattern Generator</h2>
           <form onSubmit={handleBulkGenerate}>
+            <div className={styles.formGroup}>
+              <label>Upload JSON Schedule (Optional)</label>
+              <input 
+                type="file" 
+                accept=".json"
+                className={styles.input} 
+                onChange={handleFileUpload}
+                disabled={loading}
+              />
+              {uploadedJson && <small style={{color: 'var(--accent-success)', marginTop: '0.5rem', display: 'block'}}>JSON Loaded: {uploadedJson.metadata?.title || 'Ready to import'}. Other fields below will be ignored.</small>}
+            </div>
+
             <div className={styles.splitRow}>
               <div className={styles.formGroup}>
                 <label>Student / User</label>
@@ -182,7 +238,7 @@ export default function AdminDashboard() {
                   className={styles.select}
                   value={generatorState.pattern}
                   onChange={e => setGeneratorState({...generatorState, pattern: e.target.value})}
-                  disabled={loading}
+                  disabled={loading || !!uploadedJson}
                 >
                   <option value="everyday">Everyday (M-F)</option>
                   <option value="m_w">M/W</option>
@@ -197,10 +253,10 @@ export default function AdminDashboard() {
               <input 
                 type="text" 
                 className={styles.input} 
-                placeholder="e.g. Japanese" 
+                placeholder={uploadedJson ? "Optional subject prefix..." : "e.g. Japanese"}
                 value={generatorState.textbook}
                 onChange={e => setGeneratorState({...generatorState, textbook: e.target.value})}
-                required
+                required={!uploadedJson}
                 disabled={loading}
               />
             </div>
@@ -212,7 +268,7 @@ export default function AdminDashboard() {
                 placeholder="e.g. Study Hiragana..."
                 value={generatorState.description}
                 onChange={e => setGeneratorState({...generatorState, description: e.target.value})}
-                disabled={loading}
+                disabled={loading || !!uploadedJson}
               ></textarea>
             </div>
             
@@ -224,8 +280,8 @@ export default function AdminDashboard() {
                   className={styles.input} 
                   value={generatorState.startDate}
                   onChange={e => setGeneratorState({...generatorState, startDate: e.target.value})}
-                  required
-                  disabled={loading}
+                  required={!uploadedJson}
+                  disabled={loading || !!uploadedJson}
                 />
               </div>
               <div className={styles.formGroup}>
@@ -235,8 +291,8 @@ export default function AdminDashboard() {
                   className={styles.input} 
                   value={generatorState.endDate}
                   onChange={e => setGeneratorState({...generatorState, endDate: e.target.value})}
-                  required
-                  disabled={loading}
+                  required={!uploadedJson}
+                  disabled={loading || !!uploadedJson}
                 />
               </div>
             </div>
