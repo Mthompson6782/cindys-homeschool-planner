@@ -56,15 +56,32 @@ export default function AdminDashboard() {
     
     const tasksToInsert = [];
     
-    if (uploadedJson && uploadedJson.schedule) {
+    if (uploadedJson) {
+      if (!uploadedJson.schedule || !Array.isArray(uploadedJson.schedule)) {
+        alert("The uploaded JSON doesn't contain a valid 'schedule' array. Please check the file format.");
+        setLoading(false);
+        return;
+      }
+      
       for (const session of uploadedJson.schedule) {
-        const defaultTitle = uploadedJson.metadata?.title || "Assignment";
+        const defaultTitle = uploadedJson.metadata?.title || uploadedJson.course || "Assignment";
         const prefix = generatorState.textbook ? generatorState.textbook : defaultTitle;
         const title = prefix;
         
         let desc = "";
-        if (session.lessons && session.lessons.length > 0) {
+        // Support old format (array of lessons)
+        if (session.lessons && Array.isArray(session.lessons) && session.lessons.length > 0) {
           desc = `Lessons: ${session.lessons.join(", ")}`;
+        } 
+        // Support new format (lesson and part strings)
+        else {
+          const parts = [];
+          if (session.lesson) parts.push(session.lesson);
+          if (session.part) parts.push(session.part);
+          if (session.topic) parts.push(`Topic: ${session.topic}`);
+          if (session.description) parts.push(session.description);
+          
+          desc = parts.join('\n');
         }
         
         tasksToInsert.push({
@@ -209,12 +226,13 @@ export default function AdminDashboard() {
               <label>Upload JSON Schedule (Optional)</label>
               <input 
                 type="file" 
-                accept=".json"
+                accept=".json,application/json,text/plain"
                 className={styles.input} 
                 onChange={handleFileUpload}
+                onClick={(e) => { (e.target as HTMLInputElement).value = ''; }}
                 disabled={loading}
               />
-              {uploadedJson && <small style={{color: 'var(--accent-success)', marginTop: '0.5rem', display: 'block'}}>JSON Loaded: {uploadedJson.metadata?.title || 'Ready to import'}. Other fields below will be ignored.</small>}
+              {uploadedJson && <small style={{color: 'var(--accent-success)', marginTop: '0.5rem', display: 'block'}}>JSON Loaded: {uploadedJson.metadata?.title || uploadedJson.course || 'Ready to import'}. Other fields below will be ignored.</small>}
             </div>
 
             <div className={styles.splitRow}>
