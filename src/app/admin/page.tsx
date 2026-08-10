@@ -210,6 +210,37 @@ export default function AdminDashboard() {
     setLoading(false);
   };
 
+  const handleDownloadTemplate = () => {
+    const template = {
+      course: "Example Course Name",
+      academic_year: "2026-2027",
+      schedule_days: ["Monday", "Wednesday"],
+      schedule: [
+        {
+          date: "2026-08-19",
+          day: "Wednesday",
+          lesson: "Lesson 1: Introduction",
+          part: "Part 1 - Reading"
+        },
+        {
+          date: "2026-08-24",
+          day: "Monday",
+          lesson: "Lesson 1: Introduction",
+          part: "Part 2 - Assignment"
+        }
+      ]
+    };
+    const blob = new Blob([JSON.stringify(template, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "schedule_template.json";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
   return (
     <div className={styles.adminContainer}>
       <header className={styles.header}>
@@ -223,7 +254,12 @@ export default function AdminDashboard() {
           <h2>Bulk Pattern Generator</h2>
           <form onSubmit={handleBulkGenerate}>
             <div className={styles.formGroup}>
-              <label>Upload JSON Schedule (Optional)</label>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
+                <label style={{ margin: 0 }}>Upload JSON Schedule (Optional)</label>
+                <button type="button" onClick={handleDownloadTemplate} style={{ fontSize: '0.8rem', padding: '0.2rem 0.6rem', background: 'var(--bg-card-hover)', border: '1px solid var(--border-color)', color: 'var(--text-secondary)', borderRadius: '4px', cursor: 'pointer' }}>
+                  Download Template
+                </button>
+              </div>
               <input 
                 type="file" 
                 accept=".json,application/json,text/plain"
