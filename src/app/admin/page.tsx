@@ -256,7 +256,12 @@ export default function AdminDashboard() {
             <div className={styles.formGroup}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
                 <label style={{ margin: 0 }}>Upload JSON Schedule (Optional)</label>
-                <button type="button" onClick={handleDownloadTemplate} style={{ fontSize: '0.8rem', padding: '0.2rem 0.6rem', background: 'var(--bg-card-hover)', border: '1px solid var(--border-color)', color: 'var(--text-secondary)', borderRadius: '4px', cursor: 'pointer' }}>
+                <button 
+                  type="button" 
+                  onClick={handleDownloadTemplate} 
+                  className={styles.buttonOutline}
+                  style={{ padding: '0.4rem 0.8rem', fontSize: '0.85rem', width: 'auto', margin: 0 }}
+                >
                   Download Template
                 </button>
               </div>
