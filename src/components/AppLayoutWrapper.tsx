@@ -17,7 +17,8 @@ export default function AppLayoutWrapper({ children }: { children: React.ReactNo
   // Hide sidebar on specific views
   const isDailyView = pathname?.startsWith("/day/");
   const isAdminView = pathname?.startsWith("/admin");
-  const hideSidebar = isDailyView || isAdminView;
+  const isWidgetView = pathname?.startsWith("/widget");
+  const hideSidebar = isDailyView || isAdminView || isWidgetView;
 
   return (
     <div className={styles.appContainer}>

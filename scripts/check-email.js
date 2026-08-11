@@ -22,7 +22,7 @@ async function checkEmails() {
 
     // Search for unread emails from the specific address with the subject keyword
     const searchCriteria = [
-      'ALL',
+      'UNSEEN',
       ['FROM', 'mthompson6782@gmail.com'],
       ['SUBJECT', 'New Feature Request']
     ];
@@ -46,11 +46,17 @@ async function checkEmails() {
       
       const parsed = await simpleParser(idHeader + all.body);
       
+      const headers = item.parts.find(p => p.which === 'HEADER').body;
+      const subjectKey = Object.keys(headers).find(k => k.toLowerCase() === 'subject');
+      const subject = headers[subjectKey][0];
+      
+      if (subject.toLowerCase().startsWith('re:') || subject.toLowerCase().startsWith('fwd:')) {
+        continue;
+      }
+      
       console.log("=== NEW FEATURE REQUEST FOUND ===");
       console.log("UID:", id);
-      const headers = item.parts.find(p => p.which === 'HEADER').body;
-      const subject = Object.keys(headers).find(k => k.toLowerCase() === 'subject');
-      console.log("Subject:", headers[subject][0]);
+      console.log("Subject:", subject);
       console.log("Content:", parsed.text);
       console.log("=================================");
     }
