@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { format, parseISO } from "date-fns";
+import { format, parseISO, addDays, isWeekend, getDay } from "date-fns";
 import styles from "./DailyPlanner.module.css";
 import { mockSchedule } from "@/lib/mockData";
 import { use, useState, useEffect, useCallback } from "react";
@@ -141,6 +141,23 @@ export default function DailyPlanner({ params, searchParams }: { params: Promise
     // Delete from Supabase
     await supabase.from('tasks').delete().eq('id', taskId);
   };
+
+  const bumpTask = async (task: Task) => {
+    // Move task to the next weekday
+    let nextDate = addDays(parseISO(dateStr), 1);
+    if (isWeekend(nextDate)) {
+      nextDate = getDay(nextDate) === 6 ? addDays(nextDate, 2) : addDays(nextDate, 1);
+    }
+
+    // Optimistic UI update — remove from today's list
+    setTasks(prev => prev.filter(t => t.id !== task.id));
+
+    // Update the date in Supabase
+    await supabase
+      .from('tasks')
+      .update({ date: format(nextDate, 'yyyy-MM-dd') })
+      .eq('id', task.id);
+  };
   
   let displayDate = "Unknown Date";
   
@@ -223,7 +240,7 @@ export default function DailyPlanner({ params, searchParams }: { params: Promise
               </div>
               <div className={styles.assignmentActions}>
                 <button className={styles.actionButton} onClick={() => completeTask(assignment.id!)}>Complete</button>
-                <button className={`${styles.actionButton} ${styles.bumpButton}`}>Bump</button>
+                <button className={`${styles.actionButton} ${styles.bumpButton}`} onClick={() => bumpTask(assignment)}>Bump</button>
                 <button 
                   className={styles.actionButton} 
                   style={{ color: 'var(--accent-warning)', border: '1px solid var(--accent-warning)', background: 'transparent' }}
