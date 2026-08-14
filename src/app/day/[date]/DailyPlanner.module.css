@@ -49,28 +49,115 @@
   font-size: 1.1rem;
 }
 
-.quoteSection {
-  background: linear-gradient(135deg, rgba(59, 130, 246, 0.05), rgba(236, 72, 153, 0.05));
-  border-left: 4px solid var(--accent-leo);
-  padding: 1.5rem;
-  border-radius: 0 var(--radius-md) var(--radius-md) 0;
+/* --- Daily Wisdom Section --- */
+.wisdomSection {
   margin-bottom: 2rem;
 }
 
+.wisdomHeading {
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--text-secondary);
+  margin-bottom: 1rem;
+}
+
+.wisdomGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+}
+
+.wisdomCard {
+  background: var(--bg-glass);
+  border: 1px solid var(--border-light);
+  border-left: 4px solid var(--accent-leo);
+  border-radius: 0 var(--radius-md) var(--radius-md) 0;
+  padding: 1.25rem;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.wisdomCard:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.latinCard {
+  border-left-color: var(--accent-alex);
+}
+
+.japaneseCard {
+  border-left-color: var(--accent-cindy);
+}
+
+.wisdomLabel {
+  display: inline-block;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-secondary);
+  background: var(--bg-main);
+  padding: 2px 8px;
+  border-radius: var(--radius-sm);
+  margin-bottom: 0.75rem;
+}
+
 .quoteText {
-  font-size: 1.15rem;
+  font-size: 1.05rem;
   font-style: italic;
   color: var(--text-primary);
   margin-bottom: 0.5rem;
   font-weight: 500;
+  line-height: 1.5;
 }
 
 .quoteAuthor {
-  font-size: 0.9rem;
+  font-size: 0.8rem;
   color: var(--text-secondary);
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.05em;
+}
+
+.latinOriginal {
+  font-size: 1.1rem;
+  font-style: italic;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 0.35rem;
+  line-height: 1.4;
+}
+
+.japaneseHiragana {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 0.25rem;
+  line-height: 1.5;
+}
+
+.japaneseRomaji {
+  font-size: 0.85rem;
+  font-style: italic;
+  color: var(--text-secondary);
+  margin-bottom: 0.35rem;
+}
+
+.wisdomTranslation {
+  font-size: 0.95rem;
+  color: var(--text-primary);
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+  line-height: 1.4;
+}
+
+.wisdomUsage {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  font-style: italic;
 }
 
 .assignmentsBlurb {
@@ -195,12 +282,16 @@
     font-size: 0.9rem;
   }
   
-  .quoteSection {
+  .wisdomGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .wisdomCard {
     padding: 1rem;
   }
-  
+
   .quoteText {
-    font-size: 1rem;
+    font-size: 0.95rem;
   }
 
   .timeSlot {
