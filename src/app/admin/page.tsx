@@ -7,7 +7,7 @@ import { addDays, format, isWeekend, parseISO, getDay, isAfter, isEqual } from '
 import { useUserPreferences, UserProfile } from '@/components/UserProvider';
 
 export default function AdminDashboard() {
-  const { points, setPointBalance, grandPrize, setGrandPrize } = useUserPreferences();
+  const { points, setPointBalance, grandPrize, setGrandPrize, activeUser } = useUserPreferences();
   
   const [generatorState, setGeneratorState] = useState({
     user: 'leo',
@@ -366,8 +366,9 @@ export default function AdminDashboard() {
         </section>
 
         {/* Manage Knowledge Points */}
-        <section className={styles.card}>
-          <h2>Manage Knowledge Points</h2>
+        {(activeUser === 'admin' || activeUser === 'cindy') && (
+          <section className={styles.card}>
+            <h2>Manage Knowledge Points</h2>
           <p style={{ color: 'var(--text-secondary)', marginBottom: '1.5rem', fontSize: '0.9rem' }}>
             Adjust the daily wisdom reward points for each student.
           </p>
@@ -412,6 +413,7 @@ export default function AdminDashboard() {
             />
           </div>
         </section>
+        )}
         </div>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
