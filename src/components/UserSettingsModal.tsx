@@ -77,40 +77,6 @@ export default function UserSettingsModal({ isOpen, onClose }: UserSettingsModal
             className={styles.hiddenInput} 
             ref={fileInputRef}
             onChange={handleImageUpload}
-          />
-        </div>
-
-        {activeUser === 'admin' && (
-          <div className={styles.section}>
-            <h3 className={styles.sectionTitle}>Manage Knowledge Points</h3>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', background: 'var(--bg-glass)', padding: '1rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-light)' }}>
-              {(['leo', 'alex', 'cindy'] as UserProfile[]).map(student => (
-                <div key={student} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <span style={{ textTransform: 'capitalize', fontWeight: '600', color: 'var(--text-primary)' }}>{student}</span>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                    <input 
-                      type="number" 
-                      value={points[student] || 0} 
-                      onChange={(e) => setPointBalance(student, parseInt(e.target.value) || 0)}
-                      style={{ 
-                        width: '70px', 
-                        padding: '6px', 
-                        borderRadius: 'var(--radius-sm)', 
-                        border: '1px solid var(--border-dark)', 
-                        background: 'var(--bg-main)', 
-                        color: 'var(--text-primary)',
-                        textAlign: 'right',
-                        fontWeight: '600'
-                      }}
-                    />
-                    <span style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', fontWeight: 'bold' }}>PTS</span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
         <div className={styles.section}>
           <h3 className={styles.sectionTitle}>App Theme</h3>
           <div className={styles.themeSelector}>
