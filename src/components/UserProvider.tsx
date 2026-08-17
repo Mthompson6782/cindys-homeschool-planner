@@ -12,6 +12,8 @@ interface UserContextType {
   setTheme: (theme: ThemePreference) => void;
   avatars: Record<UserProfile, string | null>;
   setAvatar: (user: UserProfile, base64Image: string) => void;
+  points: Record<UserProfile, number>;
+  addPoints: (user: UserProfile, amount: number) => void;
 }
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
@@ -24,6 +26,12 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
     leo: null,
     alex: null,
     cindy: null,
+  });
+  const [points, setPoints] = useState<Record<UserProfile, number>>({
+    admin: 0,
+    leo: 0,
+    alex: 0,
+    cindy: 0,
   });
   const [mounted, setMounted] = useState(false);
 
@@ -43,6 +51,15 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
         console.error("Failed to parse avatars");
       }
     }
+
+    const savedPoints = localStorage.getItem("userPoints");
+    if (savedPoints) {
+      try {
+        setPoints(JSON.parse(savedPoints));
+      } catch (e) {
+        console.error("Failed to parse points");
+      }
+    }
     
     setMounted(true);
   }, []);
@@ -53,8 +70,9 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
       localStorage.setItem("activeUser", activeUser);
       localStorage.setItem("themePreference", theme);
       localStorage.setItem("userAvatars", JSON.stringify(avatars));
+      localStorage.setItem("userPoints", JSON.stringify(points));
     }
-  }, [activeUser, theme, avatars, mounted]);
+  }, [activeUser, theme, avatars, points, mounted]);
 
   // Apply theme to document element
   useEffect(() => {
@@ -92,17 +110,21 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
     setAvatars(prev => ({ ...prev, [user]: base64Image }));
   };
 
+  const handleAddPoints = (user: UserProfile, amount: number) => {
+    setPoints(prev => ({ ...prev, [user]: (prev[user] || 0) + amount }));
+  };
+
   // Prevent hydration mismatch by hiding until mounted, but still provide context for SSR
   if (!mounted) {
     return (
-      <UserContext.Provider value={{ activeUser, setActiveUser, theme, setTheme, avatars, setAvatar: handleSetAvatar }}>
+      <UserContext.Provider value={{ activeUser, setActiveUser, theme, setTheme, avatars, setAvatar: handleSetAvatar, points, addPoints: handleAddPoints }}>
         <div style={{ visibility: 'hidden' }}>{children}</div>
       </UserContext.Provider>
     );
   }
 
   return (
-    <UserContext.Provider value={{ activeUser, setActiveUser, theme, setTheme, avatars, setAvatar: handleSetAvatar }}>
+    <UserContext.Provider value={{ activeUser, setActiveUser, theme, setTheme, avatars, setAvatar: handleSetAvatar, points, addPoints: handleAddPoints }}>
       {children}
     </UserContext.Provider>
   );

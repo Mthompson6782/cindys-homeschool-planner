@@ -99,7 +99,7 @@ export default function DailyPlanner({ params, searchParams }: { params: Promise
   const resolvedParams = use(params);
   const resolvedSearch = use(searchParams);
   
-  const { activeUser } = useUserPreferences();
+  const { activeUser, points, addPoints } = useUserPreferences();
   
   const dateStr = resolvedParams.date;
   
@@ -108,7 +108,24 @@ export default function DailyPlanner({ params, searchParams }: { params: Promise
   
   const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(true);
-  const [showAllQuotes, setShowAllQuotes] = useState(false);
+  const [flipped, setFlipped] = useState<Record<string, boolean>>({});
+  const [rewards, setRewards] = useState<Record<string, { type: 'points' | 'prize', text: string }>>({});
+
+  const handleFlipCard = (id: string) => {
+    if (flipped[id]) return;
+    
+    // 20% chance for a prize
+    const isPrize = Math.random() < 0.2; 
+    const rewardType = isPrize ? 'prize' : 'points';
+    const rewardText = isPrize ? 'PRIZE: Pick Dinner Tonight!' : '+5 Knowledge Points';
+    
+    setRewards(prev => ({ ...prev, [id]: { type: rewardType, text: rewardText } }));
+    setFlipped(prev => ({ ...prev, [id]: true }));
+    
+    if (!isPrize && addPoints) {
+      addPoints(activeUser, 5);
+    }
+  };
 
   const fetchTasks = useCallback(async () => {
     setLoading(true);
@@ -182,8 +199,6 @@ export default function DailyPlanner({ params, searchParams }: { params: Promise
   const dailyLatin = latinSayings[(dateHash * 7) % latinSayings.length];
   const dailyJapanese = japaneseSayings[(dateHash * 13) % japaneseSayings.length];
 
-  // 0 = Strategy, 1 = Latin, 2 = Japanese
-  const quoteCategoryIndex = dateHash % 3;
 
   const dayAssignments = tasks.filter(a => 
     (userFilter === "all" || a.user === userFilter)
@@ -214,44 +229,47 @@ export default function DailyPlanner({ params, searchParams }: { params: Promise
       <div className={styles.wisdomSection}>
         <div className={styles.wisdomHeader}>
           <h3 className={styles.wisdomHeading}>Daily Wisdom</h3>
-          <button 
-            className={styles.toggleQuotesButton}
-            onClick={() => setShowAllQuotes(!showAllQuotes)}
-          >
-            {showAllQuotes ? "Show Less" : "Show All Quotes"}
-          </button>
+          <div className={styles.pointsDisplay}>
+            🧠 {points?.[activeUser] || 0} PTS
+          </div>
         </div>
 
-        <div className={`${styles.wisdomGrid} ${showAllQuotes ? styles.wisdomGridAll : styles.wisdomGridSingle}`}>
-          {/* Strategic Quote */}
-          {(showAllQuotes || quoteCategoryIndex === 0) && (
-            <div className={styles.wisdomCard}>
-              <span className={styles.wisdomLabel}>Strategy</span>
-              <p className={styles.quoteText}>&ldquo;{dailyQuote.text}&rdquo;</p>
-              <p className={styles.quoteAuthor}>&mdash; {dailyQuote.author}</p>
+        <div className={styles.wisdomGrid}>
+          {[
+            { id: 'strategy', label: 'Strategy', content: <><p className={styles.quoteText}>&ldquo;{dailyQuote.text}&rdquo;</p><p className={styles.quoteAuthor}>&mdash; {dailyQuote.author}</p></>, bgClass: styles.strategyBack },
+            { id: 'latin', label: 'Latin', content: <><p className={styles.latinOriginal}>{dailyLatin.latin}</p><p className={styles.wisdomTranslation}>{dailyLatin.english}</p><p className={styles.wisdomUsage}>{dailyLatin.usage}</p></>, bgClass: styles.latinBack },
+            { id: 'japanese', label: '日本語', content: <><p className={styles.japaneseHiragana}>{dailyJapanese.hiragana}</p><p className={styles.japaneseRomaji}>{dailyJapanese.romaji}</p><p className={styles.wisdomTranslation}>{dailyJapanese.english}</p><p className={styles.wisdomUsage}>{dailyJapanese.usage}</p></>, bgClass: styles.japaneseBack },
+          ].map((card) => (
+            <div key={card.id} className={`${styles.flipContainer} ${flipped[card.id] ? styles.flipped : ''}`}>
+              <div className={styles.flipper}>
+                {/* Front (Mystery) */}
+                <div className={styles.cardFront} onClick={() => handleFlipCard(card.id)}>
+                  <div className={styles.mysteryIcon}>?</div>
+                  <div className={styles.mysteryText}>Reveal Daily Wisdom</div>
+                </div>
+                
+                {/* Back (Content) */}
+                <div className={`${styles.cardBack} ${card.bgClass}`}>
+                  <span className={styles.wisdomLabel}>{card.label}</span>
+                  {card.content}
+                  
+                  {rewards[card.id] && (
+                    <div className={styles.rewardBadge}>
+                      {rewards[card.id].type === 'points' ? (
+                        <div className={styles.rewardPoints}>
+                          🧠 {rewards[card.id].text}
+                        </div>
+                      ) : (
+                        <div className={styles.rewardPrize}>
+                          🎟️ {rewards[card.id].text}
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              </div>
             </div>
-          )}
-
-          {/* Latin Proverb */}
-          {(showAllQuotes || quoteCategoryIndex === 1) && (
-            <div className={`${styles.wisdomCard} ${styles.latinCard}`}>
-              <span className={styles.wisdomLabel}>Latin</span>
-              <p className={styles.latinOriginal}>{dailyLatin.latin}</p>
-              <p className={styles.wisdomTranslation}>{dailyLatin.english}</p>
-              <p className={styles.wisdomUsage}>{dailyLatin.usage}</p>
-            </div>
-          )}
-
-          {/* Japanese Saying */}
-          {(showAllQuotes || quoteCategoryIndex === 2) && (
-            <div className={`${styles.wisdomCard} ${styles.japaneseCard}`}>
-              <span className={styles.wisdomLabel}>日本語</span>
-              <p className={styles.japaneseHiragana}>{dailyJapanese.hiragana}</p>
-              <p className={styles.japaneseRomaji}>{dailyJapanese.romaji}</p>
-              <p className={styles.wisdomTranslation}>{dailyJapanese.english}</p>
-              <p className={styles.wisdomUsage}>{dailyJapanese.usage}</p>
-            </div>
-          )}
+          ))}
         </div>
       </div>
 
