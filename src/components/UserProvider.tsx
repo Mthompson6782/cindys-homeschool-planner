@@ -29,7 +29,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
     admin: null,
     leo: null,
     alex: null,
-    cindy: null,
+    cindy: '/teacher_icon.jpg',
   });
   const [points, setPoints] = useState<Record<UserProfile, number>>({
     admin: 0,
@@ -51,7 +51,12 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
     const savedAvatars = localStorage.getItem("userAvatars");
     if (savedAvatars) {
       try {
-        setAvatars(JSON.parse(savedAvatars));
+        const parsed = JSON.parse(savedAvatars);
+        // Ensure default teacher icon isn't overwritten by null if they haven't uploaded a custom one
+        if (parsed.cindy === null) {
+          parsed.cindy = '/teacher_icon.jpg';
+        }
+        setAvatars(parsed);
       } catch (e) {
         console.error("Failed to parse avatars");
       }
