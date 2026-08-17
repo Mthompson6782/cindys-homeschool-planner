@@ -100,7 +100,7 @@ export default function DailyPlanner({ params, searchParams }: { params: Promise
   const resolvedParams = use(params);
   const resolvedSearch = use(searchParams);
   
-  const { activeUser, points, addPoints, resetPoints } = useUserPreferences();
+  const { activeUser, points, addPoints, resetPoints, grandPrize } = useUserPreferences();
   
   const dateStr = resolvedParams.date;
   
@@ -118,7 +118,7 @@ export default function DailyPlanner({ params, searchParams }: { params: Promise
     // 20% chance for a prize
     const isPrize = Math.random() < 0.2; 
     const rewardType = isPrize ? 'prize' : 'points';
-    const rewardText = isPrize ? 'PRIZE: Pick Dinner Tonight!' : '+5 Knowledge Points';
+    const rewardText = isPrize ? `PRIZE: ${grandPrize || 'Pick Dinner Tonight!'}` : '+5 Knowledge Points';
     
     setRewards(prev => ({ ...prev, [id]: { type: rewardType, text: rewardText } }));
     setFlipped(prev => ({ ...prev, [id]: true }));

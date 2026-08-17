@@ -7,7 +7,7 @@ import { addDays, format, isWeekend, parseISO, getDay, isAfter, isEqual } from '
 import { useUserPreferences, UserProfile } from '@/components/UserProvider';
 
 export default function AdminDashboard() {
-  const { points, setPointBalance } = useUserPreferences();
+  const { points, setPointBalance, grandPrize, setGrandPrize } = useUserPreferences();
   
   const [generatorState, setGeneratorState] = useState({
     user: 'leo',
@@ -489,6 +489,21 @@ export default function AdminDashboard() {
                   </div>
                 </div>
               ))}
+            </div>
+
+            <h3 style={{ marginTop: '2rem', marginBottom: '1rem', fontSize: '1.2rem' }}>Grand Prize Settings</h3>
+            <p style={{ color: 'var(--text-secondary)', marginBottom: '1rem', fontSize: '0.9rem' }}>
+              Set the text that appears when a student wins the 20% random Grand Prize on the daily wisdom tiles.
+            </p>
+            <div className={styles.formGroup}>
+              <label>Current Grand Prize</label>
+              <input 
+                type="text" 
+                className={styles.input} 
+                value={grandPrize || ''}
+                onChange={(e) => setGrandPrize(e.target.value)}
+                placeholder="e.g. Pick Dinner Tonight!"
+              />
             </div>
           </section>
         </div>

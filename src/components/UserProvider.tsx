@@ -16,6 +16,8 @@ interface UserContextType {
   addPoints: (user: UserProfile, amount: number) => void;
   setPointBalance: (user: UserProfile, amount: number) => void;
   resetPoints: () => void;
+  grandPrize: string;
+  setGrandPrize: (prize: string) => void;
 }
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
@@ -35,6 +37,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
     alex: 0,
     cindy: 0,
   });
+  const [grandPrize, setGrandPrize] = useState<string>("Pick Dinner Tonight!");
   const [mounted, setMounted] = useState(false);
 
   // Load from localStorage on mount
@@ -62,6 +65,9 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
         console.error("Failed to parse points");
       }
     }
+
+    const savedPrize = localStorage.getItem("grandPrize");
+    if (savedPrize) setGrandPrize(savedPrize);
     
     setMounted(true);
   }, []);
@@ -73,8 +79,9 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
       localStorage.setItem("themePreference", theme);
       localStorage.setItem("userAvatars", JSON.stringify(avatars));
       localStorage.setItem("userPoints", JSON.stringify(points));
+      localStorage.setItem("grandPrize", grandPrize);
     }
-  }, [activeUser, theme, avatars, points, mounted]);
+  }, [activeUser, theme, avatars, points, grandPrize, mounted]);
 
   // Apply theme to document element
   useEffect(() => {
@@ -127,14 +134,14 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
   // Prevent hydration mismatch by hiding until mounted, but still provide context for SSR
   if (!mounted) {
     return (
-      <UserContext.Provider value={{ activeUser, setActiveUser, theme, setTheme, avatars, setAvatar: handleSetAvatar, points, addPoints: handleAddPoints, setPointBalance: handleSetPointBalance, resetPoints: handleResetPoints }}>
+      <UserContext.Provider value={{ activeUser, setActiveUser, theme, setTheme, avatars, setAvatar: handleSetAvatar, points, addPoints: handleAddPoints, setPointBalance: handleSetPointBalance, resetPoints: handleResetPoints, grandPrize, setGrandPrize }}>
         <div style={{ visibility: 'hidden' }}>{children}</div>
       </UserContext.Provider>
     );
   }
 
   return (
-    <UserContext.Provider value={{ activeUser, setActiveUser, theme, setTheme, avatars, setAvatar: handleSetAvatar, points, addPoints: handleAddPoints, setPointBalance: handleSetPointBalance, resetPoints: handleResetPoints }}>
+    <UserContext.Provider value={{ activeUser, setActiveUser, theme, setTheme, avatars, setAvatar: handleSetAvatar, points, addPoints: handleAddPoints, setPointBalance: handleSetPointBalance, resetPoints: handleResetPoints, grandPrize, setGrandPrize }}>
       {children}
     </UserContext.Provider>
   );
