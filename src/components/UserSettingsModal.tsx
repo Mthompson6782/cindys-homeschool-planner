@@ -77,6 +77,9 @@ export default function UserSettingsModal({ isOpen, onClose }: UserSettingsModal
             className={styles.hiddenInput} 
             ref={fileInputRef}
             onChange={handleImageUpload}
+          />
+        </div>
+
         <div className={styles.section}>
           <h3 className={styles.sectionTitle}>App Theme</h3>
           <div className={styles.themeSelector}>
