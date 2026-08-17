@@ -14,6 +14,7 @@ interface UserContextType {
   setAvatar: (user: UserProfile, base64Image: string) => void;
   points: Record<UserProfile, number>;
   addPoints: (user: UserProfile, amount: number) => void;
+  resetPoints: () => void;
 }
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
@@ -114,17 +115,21 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
     setPoints(prev => ({ ...prev, [user]: (prev[user] || 0) + amount }));
   };
 
+  const handleResetPoints = () => {
+    setPoints({ admin: 0, leo: 0, alex: 0, cindy: 0 });
+  };
+
   // Prevent hydration mismatch by hiding until mounted, but still provide context for SSR
   if (!mounted) {
     return (
-      <UserContext.Provider value={{ activeUser, setActiveUser, theme, setTheme, avatars, setAvatar: handleSetAvatar, points, addPoints: handleAddPoints }}>
+      <UserContext.Provider value={{ activeUser, setActiveUser, theme, setTheme, avatars, setAvatar: handleSetAvatar, points, addPoints: handleAddPoints, resetPoints: handleResetPoints }}>
         <div style={{ visibility: 'hidden' }}>{children}</div>
       </UserContext.Provider>
     );
   }
 
   return (
-    <UserContext.Provider value={{ activeUser, setActiveUser, theme, setTheme, avatars, setAvatar: handleSetAvatar, points, addPoints: handleAddPoints }}>
+    <UserContext.Provider value={{ activeUser, setActiveUser, theme, setTheme, avatars, setAvatar: handleSetAvatar, points, addPoints: handleAddPoints, resetPoints: handleResetPoints }}>
       {children}
     </UserContext.Provider>
   );

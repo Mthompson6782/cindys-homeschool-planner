@@ -100,7 +100,7 @@ export default function DailyPlanner({ params, searchParams }: { params: Promise
   const resolvedParams = use(params);
   const resolvedSearch = use(searchParams);
   
-  const { activeUser, points, addPoints } = useUserPreferences();
+  const { activeUser, points, addPoints, resetPoints } = useUserPreferences();
   
   const dateStr = resolvedParams.date;
   
@@ -240,6 +240,15 @@ export default function DailyPlanner({ params, searchParams }: { params: Promise
           <h3 className={styles.wisdomHeading}>Daily Wisdom</h3>
           <div className={styles.pointsDisplay}>
             🧠 {points?.[activeUser] || 0} PTS
+            {activeUser === 'admin' && (
+              <button 
+                onClick={resetPoints} 
+                style={{ marginLeft: '10px', fontSize: '0.65rem', padding: '2px 6px', background: 'var(--accent-warning)', border: 'none', borderRadius: '4px', cursor: 'pointer', color: 'white', textTransform: 'uppercase', fontWeight: 'bold' }}
+                title="Reset everyone's points to 0"
+              >
+                Reset
+              </button>
+            )}
           </div>
         </div>
 
