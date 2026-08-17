@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { format, parseISO, addDays, isWeekend, getDay } from "date-fns";
+import { format, parseISO, addDays, subDays, isWeekend, getDay } from "date-fns";
 import styles from "./DailyPlanner.module.css";
 import { mockSchedule } from "@/lib/mockData";
 import { use, useState, useEffect, useCallback } from "react";
@@ -161,13 +161,21 @@ export default function DailyPlanner({ params, searchParams }: { params: Promise
   };
   
   let displayDate = "Unknown Date";
+  let prevDateStr = "";
+  let nextDateStr = "";
   
   try {
     const parsedDate = parseISO(dateStr);
     displayDate = format(parsedDate, "EEEE, MMMM do, yyyy");
+    prevDateStr = format(subDays(parsedDate, 1), 'yyyy-MM-dd');
+    nextDateStr = format(addDays(parsedDate, 1), 'yyyy-MM-dd');
   } catch (e) {
     displayDate = dateStr;
+    prevDateStr = dateStr;
+    nextDateStr = dateStr;
   }
+  
+  const userQuery = resolvedSearch.user ? `?user=${resolvedSearch.user}` : "";
 
   const dateHash = dateStr.split("").reduce((acc, char) => acc + char.charCodeAt(0), 0);
   const dailyQuote = quotes[dateHash % quotes.length];
@@ -190,7 +198,15 @@ export default function DailyPlanner({ params, searchParams }: { params: Promise
           &larr;
         </Link>
         <div className={styles.headerContent}>
-          <h1>{displayDate}</h1>
+          <div className={styles.dateNavContainer}>
+            <Link href={`/day/${prevDateStr}${userQuery}`} className={styles.dateNavArrow}>
+              &larr;
+            </Link>
+            <h1>{displayDate}</h1>
+            <Link href={`/day/${nextDateStr}${userQuery}`} className={styles.dateNavArrow}>
+              &rarr;
+            </Link>
+          </div>
           <p>Daily Operations &amp; Lesson Plan</p>
         </div>
       </header>
