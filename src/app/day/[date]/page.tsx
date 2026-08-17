@@ -108,6 +108,7 @@ export default function DailyPlanner({ params, searchParams }: { params: Promise
   
   const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(true);
+  const [showAllQuotes, setShowAllQuotes] = useState(false);
 
   const fetchTasks = useCallback(async () => {
     setLoading(true);
@@ -173,6 +174,9 @@ export default function DailyPlanner({ params, searchParams }: { params: Promise
   const dailyLatin = latinSayings[(dateHash * 7) % latinSayings.length];
   const dailyJapanese = japaneseSayings[(dateHash * 13) % japaneseSayings.length];
 
+  // 0 = Strategy, 1 = Latin, 2 = Japanese
+  const quoteCategoryIndex = dateHash % 3;
+
   const dayAssignments = tasks.filter(a => 
     (userFilter === "all" || a.user === userFilter)
   );
@@ -192,32 +196,46 @@ export default function DailyPlanner({ params, searchParams }: { params: Promise
       </header>
 
       <div className={styles.wisdomSection}>
-        <h3 className={styles.wisdomHeading}>Daily Wisdom</h3>
+        <div className={styles.wisdomHeader}>
+          <h3 className={styles.wisdomHeading}>Daily Wisdom</h3>
+          <button 
+            className={styles.toggleQuotesButton}
+            onClick={() => setShowAllQuotes(!showAllQuotes)}
+          >
+            {showAllQuotes ? "Show Less" : "Show All Quotes"}
+          </button>
+        </div>
 
-        <div className={styles.wisdomGrid}>
+        <div className={`${styles.wisdomGrid} ${showAllQuotes ? styles.wisdomGridAll : styles.wisdomGridSingle}`}>
           {/* Strategic Quote */}
-          <div className={styles.wisdomCard}>
-            <span className={styles.wisdomLabel}>Strategy</span>
-            <p className={styles.quoteText}>&ldquo;{dailyQuote.text}&rdquo;</p>
-            <p className={styles.quoteAuthor}>&mdash; {dailyQuote.author}</p>
-          </div>
+          {(showAllQuotes || quoteCategoryIndex === 0) && (
+            <div className={styles.wisdomCard}>
+              <span className={styles.wisdomLabel}>Strategy</span>
+              <p className={styles.quoteText}>&ldquo;{dailyQuote.text}&rdquo;</p>
+              <p className={styles.quoteAuthor}>&mdash; {dailyQuote.author}</p>
+            </div>
+          )}
 
           {/* Latin Proverb */}
-          <div className={`${styles.wisdomCard} ${styles.latinCard}`}>
-            <span className={styles.wisdomLabel}>Latin</span>
-            <p className={styles.latinOriginal}>{dailyLatin.latin}</p>
-            <p className={styles.wisdomTranslation}>{dailyLatin.english}</p>
-            <p className={styles.wisdomUsage}>{dailyLatin.usage}</p>
-          </div>
+          {(showAllQuotes || quoteCategoryIndex === 1) && (
+            <div className={`${styles.wisdomCard} ${styles.latinCard}`}>
+              <span className={styles.wisdomLabel}>Latin</span>
+              <p className={styles.latinOriginal}>{dailyLatin.latin}</p>
+              <p className={styles.wisdomTranslation}>{dailyLatin.english}</p>
+              <p className={styles.wisdomUsage}>{dailyLatin.usage}</p>
+            </div>
+          )}
 
           {/* Japanese Saying */}
-          <div className={`${styles.wisdomCard} ${styles.japaneseCard}`}>
-            <span className={styles.wisdomLabel}>日本語</span>
-            <p className={styles.japaneseHiragana}>{dailyJapanese.hiragana}</p>
-            <p className={styles.japaneseRomaji}>{dailyJapanese.romaji}</p>
-            <p className={styles.wisdomTranslation}>{dailyJapanese.english}</p>
-            <p className={styles.wisdomUsage}>{dailyJapanese.usage}</p>
-          </div>
+          {(showAllQuotes || quoteCategoryIndex === 2) && (
+            <div className={`${styles.wisdomCard} ${styles.japaneseCard}`}>
+              <span className={styles.wisdomLabel}>日本語</span>
+              <p className={styles.japaneseHiragana}>{dailyJapanese.hiragana}</p>
+              <p className={styles.japaneseRomaji}>{dailyJapanese.romaji}</p>
+              <p className={styles.wisdomTranslation}>{dailyJapanese.english}</p>
+              <p className={styles.wisdomUsage}>{dailyJapanese.usage}</p>
+            </div>
+          )}
         </div>
       </div>
 
