@@ -252,8 +252,9 @@ export default function AdminDashboard() {
       </header>
 
       <div className={styles.grid}>
-        {/* Bulk Pattern Generator */}
-        <section className={styles.card}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+          {/* Bulk Pattern Generator */}
+          <section className={styles.card}>
           <h2>Bulk Pattern Generator</h2>
           <form onSubmit={handleBulkGenerate}>
             <div className={styles.formGroup}>
@@ -364,6 +365,55 @@ export default function AdminDashboard() {
           </form>
         </section>
 
+        {/* Manage Knowledge Points */}
+        <section className={styles.card}>
+          <h2>Manage Knowledge Points</h2>
+          <p style={{ color: 'var(--text-secondary)', marginBottom: '1.5rem', fontSize: '0.9rem' }}>
+            Adjust the daily wisdom reward points for each student.
+          </p>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', background: 'var(--bg-glass)', padding: '1rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-light)' }}>
+            {(['leo', 'alex', 'cindy'] as UserProfile[]).map(student => (
+              <div key={student} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <span style={{ textTransform: 'capitalize', fontWeight: '600', color: 'var(--text-primary)' }}>{student}</span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  <input 
+                    type="number" 
+                    value={points?.[student] || 0} 
+                    onChange={(e) => setPointBalance(student, parseInt(e.target.value) || 0)}
+                    style={{ 
+                      width: '70px', 
+                      padding: '6px', 
+                      borderRadius: 'var(--radius-sm)', 
+                      border: '1px solid var(--border-dark)', 
+                      background: 'var(--bg-main)', 
+                      color: 'var(--text-primary)',
+                      textAlign: 'right',
+                      fontWeight: '600'
+                    }}
+                  />
+                  <span style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', fontWeight: 'bold' }}>PTS</span>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <h3 style={{ marginTop: '2rem', marginBottom: '1rem', fontSize: '1.2rem' }}>Grand Prize Settings</h3>
+          <p style={{ color: 'var(--text-secondary)', marginBottom: '1rem', fontSize: '0.9rem' }}>
+            Set the text that appears when a student wins the 20% random Grand Prize on the daily wisdom tiles.
+          </p>
+          <div className={styles.formGroup}>
+            <label>Current Grand Prize</label>
+            <input 
+              type="text" 
+              className={styles.input} 
+              value={grandPrize || ''}
+              onChange={(e) => setGrandPrize(e.target.value)}
+              placeholder="e.g. Pick Dinner Tonight!"
+            />
+          </div>
+        </section>
+        </div>
+
         <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
           {/* Add Single Assignment */}
           <section className={styles.card}>
@@ -457,54 +507,6 @@ export default function AdminDashboard() {
                 {loading ? 'Bumping Tasks...' : 'Apply Blackout & Bump Forward'}
               </button>
             </form>
-          </section>
-
-          {/* Manage Knowledge Points */}
-          <section className={styles.card}>
-            <h2>Manage Knowledge Points</h2>
-            <p style={{ color: 'var(--text-secondary)', marginBottom: '1.5rem', fontSize: '0.9rem' }}>
-              Adjust the daily wisdom reward points for each student.
-            </p>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', background: 'var(--bg-glass)', padding: '1rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-light)' }}>
-              {(['leo', 'alex', 'cindy'] as UserProfile[]).map(student => (
-                <div key={student} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <span style={{ textTransform: 'capitalize', fontWeight: '600', color: 'var(--text-primary)' }}>{student}</span>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                    <input 
-                      type="number" 
-                      value={points?.[student] || 0} 
-                      onChange={(e) => setPointBalance(student, parseInt(e.target.value) || 0)}
-                      style={{ 
-                        width: '70px', 
-                        padding: '6px', 
-                        borderRadius: 'var(--radius-sm)', 
-                        border: '1px solid var(--border-dark)', 
-                        background: 'var(--bg-main)', 
-                        color: 'var(--text-primary)',
-                        textAlign: 'right',
-                        fontWeight: '600'
-                      }}
-                    />
-                    <span style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', fontWeight: 'bold' }}>PTS</span>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            <h3 style={{ marginTop: '2rem', marginBottom: '1rem', fontSize: '1.2rem' }}>Grand Prize Settings</h3>
-            <p style={{ color: 'var(--text-secondary)', marginBottom: '1rem', fontSize: '0.9rem' }}>
-              Set the text that appears when a student wins the 20% random Grand Prize on the daily wisdom tiles.
-            </p>
-            <div className={styles.formGroup}>
-              <label>Current Grand Prize</label>
-              <input 
-                type="text" 
-                className={styles.input} 
-                value={grandPrize || ''}
-                onChange={(e) => setGrandPrize(e.target.value)}
-                placeholder="e.g. Pick Dinner Tonight!"
-              />
-            </div>
           </section>
         </div>
       </div>
