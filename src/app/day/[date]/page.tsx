@@ -7,6 +7,7 @@ import { mockSchedule } from "@/lib/mockData";
 import { use, useState, useEffect, useCallback } from "react";
 import { useUserPreferences } from "@/components/UserProvider";
 import { supabase, Task } from "@/lib/supabase";
+import confetti from "canvas-confetti";
 
 // Strategic & philosophical quotes
 const quotes = [
@@ -121,6 +122,14 @@ export default function DailyPlanner({ params, searchParams }: { params: Promise
     
     setRewards(prev => ({ ...prev, [id]: { type: rewardType, text: rewardText } }));
     setFlipped(prev => ({ ...prev, [id]: true }));
+    
+    if (isPrize) {
+      confetti({
+        particleCount: 150,
+        spread: 100,
+        origin: { y: 0.6 }
+      });
+    }
     
     if (!isPrize && addPoints) {
       addPoints(activeUser, 5);
