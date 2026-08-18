@@ -169,7 +169,7 @@ export default function DailyPlanner({ params, searchParams }: { params: Promise
     await supabase.from('tasks').delete().eq('id', taskId);
   };
 
-  const bumpTask = async (task: Task) => {
+  const addToNextDay = async (task: Task) => {
     // Move task to the next weekday
     let nextDate = addDays(parseISO(dateStr), 1);
     if (isWeekend(nextDate)) {
@@ -184,6 +184,38 @@ export default function DailyPlanner({ params, searchParams }: { params: Promise
       .from('tasks')
       .update({ date: format(nextDate, 'yyyy-MM-dd') })
       .eq('id', task.id);
+  };
+
+  const bumpCascade = async (task: Task) => {
+    // Optimistic UI update for the current task
+    setTasks(prev => prev.filter(t => t.id !== task.id));
+
+    // 1. Fetch all tasks for this user & title that are on or after this task's date
+    const { data: futureTasks, error } = await supabase
+      .from('tasks')
+      .select('*')
+      .eq('user', task.user)
+      .eq('title', task.title)
+      .gte('date', task.date)
+      .order('date', { ascending: true });
+
+    if (error || !futureTasks) {
+      console.error("Error fetching future tasks for cascade bump:", error);
+      return;
+    }
+
+    // 2. Shift each task forward by 1 valid school day
+    for (const t of futureTasks) {
+      let nextDate = addDays(parseISO(t.date), 1);
+      if (isWeekend(nextDate)) {
+        nextDate = getDay(nextDate) === 6 ? addDays(nextDate, 2) : addDays(nextDate, 1);
+      }
+
+      await supabase
+        .from('tasks')
+        .update({ date: format(nextDate, 'yyyy-MM-dd') })
+        .eq('id', t.id);
+    }
   };
   
   let displayDate = "Unknown Date";
@@ -310,7 +342,20 @@ export default function DailyPlanner({ params, searchParams }: { params: Promise
               </div>
               <div className={styles.assignmentActions}>
                 <button className={styles.actionButton} onClick={() => completeTask(assignment.id!)}>Complete</button>
-                <button className={`${styles.actionButton} ${styles.bumpButton}`} onClick={() => bumpTask(assignment)}>Bump</button>
+                <button 
+                  className={`${styles.actionButton} ${styles.bumpButton}`} 
+                  onClick={() => bumpCascade(assignment)}
+                  title="Move this task and all future tasks in this topic forward 1 day"
+                >
+                  Bump
+                </button>
+                <button 
+                  className={`${styles.actionButton} ${styles.addToNextDayButton}`} 
+                  onClick={() => addToNextDay(assignment)}
+                  title="Move only this task to the next day"
+                >
+                  Add to Next Day
+                </button>
                 <button 
                   className={styles.actionButton} 
                   style={{ color: 'var(--accent-warning)', border: '1px solid var(--accent-warning)', background: 'transparent' }}

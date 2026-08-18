@@ -415,6 +415,14 @@
   border-color: rgba(239, 68, 68, 0.3);
 }
 
+.addToNextDayButton {
+  color: #f59e0b;
+}
+.addToNextDayButton:hover {
+  background: rgba(245, 158, 11, 0.1);
+  border-color: rgba(245, 158, 11, 0.3);
+}
+
 /* --- Mobile Responsiveness --- */
 @media (max-width: 768px) {
   .plannerContainer {
