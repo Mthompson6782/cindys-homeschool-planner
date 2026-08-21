@@ -297,7 +297,7 @@ export default function DailyPlanner({ params, searchParams }: { params: Promise
         </div>
       </header>
 
-      {activeUser !== 'cindy' && userFilter !== 'all' && (
+      {userFilter === 'alex' && (
         <div className={styles.wisdomSection}>
           <div className={styles.wisdomHeader}>
             <h3 className={styles.wisdomHeading}>Daily Wisdom</h3>
