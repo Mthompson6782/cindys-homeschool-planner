@@ -204,17 +204,47 @@ export default function DailyPlanner({ params, searchParams }: { params: Promise
       return;
     }
 
-    // 2. Shift each task forward by 1 valid school day
-    for (const t of futureTasks) {
-      let nextDate = addDays(parseISO(t.date), 1);
-      if (isWeekend(nextDate)) {
-        nextDate = getDay(nextDate) === 6 ? addDays(nextDate, 2) : addDays(nextDate, 1);
+    // 2. Shift each task forward by taking the date of the next scheduled task.
+    // For the last task, infer the next date from the schedule pattern.
+    for (let i = 0; i < futureTasks.length; i++) {
+      let nextDate: Date;
+      
+      if (i < futureTasks.length - 1) {
+        // Just take the date of the next scheduled task in the series
+        nextDate = parseISO(futureTasks[i+1].date);
+      } else {
+        // This is the last task. We need to infer the next date.
+        const currentTask = futureTasks[i];
+        const currentDow = getDay(parseISO(currentTask.date));
+        
+        let foundPattern = false;
+        // Search backwards starting from the task BEFORE the current one
+        for (let j = i - 1; j >= 0; j--) {
+          if (getDay(parseISO(futureTasks[j].date)) === currentDow) {
+            // Found the previous occurrence of this day of the week!
+            if (j + 1 <= i) {
+              const referenceNextTask = futureTasks[j+1];
+              const daysBetween = (parseISO(currentTask.date).getTime() - parseISO(futureTasks[j].date).getTime()) / (1000 * 60 * 60 * 24);
+              nextDate = addDays(parseISO(referenceNextTask.date), Math.round(daysBetween));
+              foundPattern = true;
+              break;
+            }
+          }
+        }
+        
+        if (!foundPattern) {
+          // Fallback: just move to the next valid school day
+          nextDate = addDays(parseISO(currentTask.date), 1);
+          if (isWeekend(nextDate)) {
+            nextDate = getDay(nextDate) === 6 ? addDays(nextDate, 2) : addDays(nextDate, 1);
+          }
+        }
       }
 
       await supabase
         .from('tasks')
-        .update({ date: format(nextDate, 'yyyy-MM-dd') })
-        .eq('id', t.id);
+        .update({ date: format(nextDate!, 'yyyy-MM-dd') })
+        .eq('id', futureTasks[i].id);
     }
   };
   
