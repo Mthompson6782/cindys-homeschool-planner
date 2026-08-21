@@ -297,61 +297,63 @@ export default function DailyPlanner({ params, searchParams }: { params: Promise
         </div>
       </header>
 
-      <div className={styles.wisdomSection}>
-        <div className={styles.wisdomHeader}>
-          <h3 className={styles.wisdomHeading}>Daily Wisdom</h3>
-          <div className={styles.pointsDisplay}>
-            🧠 {points?.[activeUser] || 0} PTS
-            {activeUser === 'admin' && (
-              <button 
-                onClick={resetPoints} 
-                style={{ marginLeft: '10px', fontSize: '0.65rem', padding: '2px 6px', background: 'var(--accent-warning)', border: 'none', borderRadius: '4px', cursor: 'pointer', color: 'white', textTransform: 'uppercase', fontWeight: 'bold' }}
-                title="Reset everyone's points to 0"
-              >
-                Reset
-              </button>
-            )}
+      {activeUser !== 'cindy' && (
+        <div className={styles.wisdomSection}>
+          <div className={styles.wisdomHeader}>
+            <h3 className={styles.wisdomHeading}>Daily Wisdom</h3>
+            <div className={styles.pointsDisplay}>
+              🧠 {points?.[activeUser] || 0} PTS
+              {activeUser === 'admin' && (
+                <button 
+                  onClick={resetPoints} 
+                  style={{ marginLeft: '10px', fontSize: '0.65rem', padding: '2px 6px', background: 'var(--accent-warning)', border: 'none', borderRadius: '4px', cursor: 'pointer', color: 'white', textTransform: 'uppercase', fontWeight: 'bold' }}
+                  title="Reset everyone's points to 0"
+                >
+                  Reset
+                </button>
+              )}
+            </div>
           </div>
-        </div>
 
-        <div className={styles.wisdomGrid}>
-          {[
-            { id: 'strategy', label: 'Strategy', content: <><p className={styles.quoteText}>&ldquo;{dailyQuote.text}&rdquo;</p><p className={styles.quoteAuthor}>&mdash; {dailyQuote.author}</p></>, bgClass: styles.strategyBack },
-            { id: 'latin', label: 'Latin', content: <><p className={styles.latinOriginal}>{dailyLatin.latin}</p><p className={styles.wisdomTranslation}>{dailyLatin.english}</p><p className={styles.wisdomUsage}>{dailyLatin.usage}</p></>, bgClass: styles.latinBack },
-            { id: 'japanese', label: '日本語', content: <><p className={styles.japaneseHiragana}>{dailyJapanese.hiragana}</p><p className={styles.japaneseRomaji}>{dailyJapanese.romaji}</p><p className={styles.wisdomTranslation}>{dailyJapanese.english}</p><p className={styles.wisdomUsage}>{dailyJapanese.usage}</p></>, bgClass: styles.japaneseBack },
-          ].map((card) => (
-            <div key={card.id} className={`${styles.flipContainer} ${flipped[card.id] ? styles.flipped : ''}`}>
-              <div className={styles.flipper}>
-                {/* Front (Mystery) */}
-                <div className={styles.cardFront} onClick={() => handleFlipCard(card.id)}>
-                  <div className={styles.mysteryIcon}>?</div>
-                  <div className={styles.mysteryText}>Reveal Daily Wisdom</div>
-                </div>
-                
-                {/* Back (Content) */}
-                <div className={`${styles.cardBack} ${card.bgClass}`}>
-                  <span className={styles.wisdomLabel}>{card.label}</span>
-                  {card.content}
+          <div className={styles.wisdomGrid}>
+            {[
+              { id: 'strategy', label: 'Strategy', content: <><p className={styles.quoteText}>&ldquo;{dailyQuote.text}&rdquo;</p><p className={styles.quoteAuthor}>&mdash; {dailyQuote.author}</p></>, bgClass: styles.strategyBack },
+              { id: 'latin', label: 'Latin', content: <><p className={styles.latinOriginal}>{dailyLatin.latin}</p><p className={styles.wisdomTranslation}>{dailyLatin.english}</p><p className={styles.wisdomUsage}>{dailyLatin.usage}</p></>, bgClass: styles.latinBack },
+              { id: 'japanese', label: '日本語', content: <><p className={styles.japaneseHiragana}>{dailyJapanese.hiragana}</p><p className={styles.japaneseRomaji}>{dailyJapanese.romaji}</p><p className={styles.wisdomTranslation}>{dailyJapanese.english}</p><p className={styles.wisdomUsage}>{dailyJapanese.usage}</p></>, bgClass: styles.japaneseBack },
+            ].map((card) => (
+              <div key={card.id} className={`${styles.flipContainer} ${flipped[card.id] ? styles.flipped : ''}`}>
+                <div className={styles.flipper}>
+                  {/* Front (Mystery) */}
+                  <div className={styles.cardFront} onClick={() => handleFlipCard(card.id)}>
+                    <div className={styles.mysteryIcon}>?</div>
+                    <div className={styles.mysteryText}>Reveal Daily Wisdom</div>
+                  </div>
                   
-                  {rewards[card.id] && (
-                    <div className={styles.rewardBadge}>
-                      {rewards[card.id].type === 'points' ? (
-                        <div className={styles.rewardPoints}>
-                          🧠 {rewards[card.id].text}
-                        </div>
-                      ) : (
-                        <div className={styles.rewardPrize}>
-                          🎟️ {rewards[card.id].text}
-                        </div>
-                      )}
-                    </div>
-                  )}
+                  {/* Back (Content) */}
+                  <div className={`${styles.cardBack} ${card.bgClass}`}>
+                    <span className={styles.wisdomLabel}>{card.label}</span>
+                    {card.content}
+                    
+                    {rewards[card.id] && (
+                      <div className={styles.rewardBadge}>
+                        {rewards[card.id].type === 'points' ? (
+                          <div className={styles.rewardPoints}>
+                            🧠 {rewards[card.id].text}
+                          </div>
+                        ) : (
+                          <div className={styles.rewardPrize}>
+                            🎟️ {rewards[card.id].text}
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
-      </div>
+      )}
 
       <div className={styles.schedule}>
         {dayAssignments.length === 0 ? (
