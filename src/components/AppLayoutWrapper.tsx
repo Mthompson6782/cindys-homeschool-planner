@@ -39,8 +39,13 @@ export default function AppLayoutWrapper({ children }: { children: React.ReactNo
               </Link>
             </li>
             <li>
+              <Link href="/transcript" className={styles.navLink}>
+                <span className={styles.icon}>📜</span> Transcript &amp; Grades
+              </Link>
+            </li>
+            <li>
               <Link href="/admin" className={styles.navLink}>
-                <span className={styles.icon}>⚙️</span> Admin & Setup
+                <span className={styles.icon}>⚙️</span> Admin &amp; Setup
               </Link>
             </li>
             <li>

@@ -25,7 +25,7 @@ export default function DailyWidget({ forcedUser }: { forcedUser?: string }) {
     
     const { data, error } = await query;
     if (data && !error) {
-      setTasks(data);
+      setTasks(data.filter(t => t.status !== 'completed'));
     }
     setLoading(false);
   }, [todayStr, userToFetch]);

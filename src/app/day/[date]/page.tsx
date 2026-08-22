@@ -144,7 +144,7 @@ export default function DailyPlanner({ params, searchParams }: { params: Promise
       .eq('date', dateStr);
       
     if (data) {
-      setTasks(data);
+      setTasks(data.filter(t => t.status !== 'completed'));
     }
     setLoading(false);
   }, [dateStr]);
@@ -157,8 +157,8 @@ export default function DailyPlanner({ params, searchParams }: { params: Promise
     // Optimistic UI update — remove from visible list
     setTasks(prev => prev.filter(t => t.id !== taskId));
     
-    // Delete the completed task from Supabase
-    await supabase.from('tasks').delete().eq('id', taskId);
+    // Mark as completed in Supabase to preserve in the student's transcript!
+    await supabase.from('tasks').update({ status: 'completed' }).eq('id', taskId);
   };
 
   const removeTask = async (taskId: string) => {

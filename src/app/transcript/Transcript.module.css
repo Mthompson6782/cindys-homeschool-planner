@@ -1,0 +1,507 @@
+.container {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+  font-family: system-ui, -apple-system, sans-serif;
+  color: var(--text-primary);
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid var(--border-light);
+}
+
+.backLink {
+  color: var(--accent-primary);
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.9rem;
+  display: inline-block;
+  margin-bottom: 0.5rem;
+}
+
+.title {
+  font-size: 2rem;
+  font-weight: 800;
+  margin: 0 0 0.5rem 0;
+  color: var(--text-primary);
+}
+
+.subtitle {
+  color: var(--text-secondary);
+  margin: 0;
+  font-size: 0.95rem;
+}
+
+.headerActions {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.tabToggleBtn {
+  background: var(--bg-glass);
+  border: 1px solid var(--border-light);
+  color: var(--text-primary);
+  padding: 10px 18px;
+  border-radius: var(--radius-md);
+  font-weight: 700;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.tabToggleBtn:hover {
+  background: var(--bg-main);
+  border-color: var(--accent-primary);
+}
+
+.printBtn {
+  background: var(--accent-primary);
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: var(--radius-md);
+  font-weight: 700;
+  font-size: 0.9rem;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.3);
+  transition: all 0.2s ease;
+}
+
+.printBtn:hover {
+  background: #1d4ed8;
+  transform: translateY(-1px);
+}
+
+/* Student Selector Bar */
+.studentSelectorBar {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  background: var(--bg-glass);
+  padding: 0.75rem 1.25rem;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-light);
+  margin-bottom: 2rem;
+}
+
+.selectorLabel {
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-secondary);
+}
+
+.studentBtn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border-dark);
+  color: var(--text-secondary);
+  padding: 6px 14px;
+  border-radius: var(--radius-full);
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.studentBtn:hover {
+  color: var(--text-primary);
+  border-color: var(--text-secondary);
+}
+
+.studentBtnActive.leo {
+  background: rgba(59, 130, 246, 0.15);
+  border-color: #3b82f6;
+  color: #60a5fa;
+}
+
+.studentBtnActive.alex {
+  background: rgba(245, 158, 11, 0.15);
+  border-color: #f59e0b;
+  color: #fbbf24;
+}
+
+.avatarMini {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+}
+
+.avatarMini img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Stats Summary Grid */
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+  margin-bottom: 2.5rem;
+}
+
+.statCard {
+  background: var(--bg-glass);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-lg);
+  padding: 1.25rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.statIcon {
+  font-size: 2.2rem;
+}
+
+.statValue {
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  line-height: 1.2;
+}
+
+.statSub {
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.statLabel {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.sectionHeading {
+  font-size: 1.4rem;
+  font-weight: 700;
+  margin-bottom: 1.25rem;
+  color: var(--text-primary);
+}
+
+.coursesGrid {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.courseCard {
+  background: var(--bg-card);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+  box-shadow: var(--shadow-sm);
+}
+
+.courseHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.courseTitle {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin: 0 0 0.25rem 0;
+  color: var(--text-primary);
+}
+
+.courseMeta {
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+}
+
+.gradeBox {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.gradeLabel {
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+
+.gradeSelect {
+  background: var(--bg-main);
+  border: 1px solid var(--border-dark);
+  color: var(--text-primary);
+  padding: 6px 10px;
+  border-radius: var(--radius-sm);
+  font-weight: 700;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.progressBarBg {
+  width: 100%;
+  height: 8px;
+  background: var(--bg-main);
+  border-radius: 999px;
+  overflow: hidden;
+  margin-bottom: 1.5rem;
+  border: 1px solid var(--border-dark);
+}
+
+.progressBarFill {
+  height: 100%;
+  background: linear-gradient(90deg, #3b82f6, #10b981);
+  border-radius: 999px;
+  transition: width 0.4s ease;
+}
+
+.masterySection {
+  border-top: 1px solid var(--border-light);
+  padding-top: 1rem;
+}
+
+.masteryHeading {
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-secondary);
+  margin: 0 0 0.75rem 0;
+}
+
+.masteryList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.masteryItem {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  background: var(--bg-main);
+  padding: 8px 12px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-dark);
+  font-size: 0.85rem;
+}
+
+.checkmark {
+  color: #10b981;
+  font-weight: 800;
+  font-size: 0.9rem;
+}
+
+.masteryContent {
+  flex: 1;
+}
+
+.masteryDate {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin-bottom: 2px;
+}
+
+.masteryDesc {
+  color: var(--text-primary);
+  white-space: pre-line;
+}
+
+.noLessons {
+  font-size: 0.85rem;
+  font-style: italic;
+  color: var(--text-muted);
+}
+
+.emptyState {
+  background: var(--bg-glass);
+  border: 1px solid var(--border-light);
+  padding: 2.5rem;
+  border-radius: var(--radius-lg);
+  text-align: center;
+  color: var(--text-secondary);
+  font-style: italic;
+}
+
+.loading {
+  text-align: center;
+  padding: 3rem;
+  color: var(--text-secondary);
+}
+
+/* =========================================================
+   OFFICIAL PRINTABLE TRANSCRIPT STYLES (Paper Format)
+   ========================================================= */
+.officialTranscript {
+  background: #ffffff;
+  color: #0f172a;
+  border-radius: 12px;
+  padding: 3rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  font-family: 'Times New Roman', Times, serif, Georgia;
+}
+
+.officialHeader {
+  text-align: center;
+  border-bottom: 2px solid #0f172a;
+  padding-bottom: 1.25rem;
+  margin-bottom: 1.5rem;
+}
+
+.officialSchoolName {
+  font-size: 1.6rem;
+  font-weight: 900;
+  letter-spacing: 0.1em;
+  margin-bottom: 0.25rem;
+}
+
+.officialDocTitle {
+  font-size: 1.2rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  color: #334155;
+}
+
+.officialSubtitle {
+  font-size: 0.95rem;
+  color: #64748b;
+  font-style: italic;
+  margin-top: 0.25rem;
+}
+
+.studentInfoGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem 2rem;
+  margin-bottom: 2rem;
+  font-size: 0.95rem;
+  font-family: system-ui, sans-serif;
+}
+
+.infoRow {
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 1px dotted #cbd5e1;
+  padding-bottom: 4px;
+}
+
+.transcriptTable {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 2rem;
+  font-size: 0.9rem;
+  font-family: system-ui, sans-serif;
+}
+
+.transcriptTable th {
+  background: #f1f5f9;
+  color: #0f172a;
+  padding: 10px 12px;
+  border: 1px solid #cbd5e1;
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: 0.8rem;
+  letter-spacing: 0.05em;
+}
+
+.transcriptTable td {
+  padding: 10px 12px;
+  border: 1px solid #cbd5e1;
+  color: #1e293b;
+}
+
+.transcriptTable tbody tr:nth-child(even) {
+  background: #f8fafc;
+}
+
+.transcriptMasterySection {
+  margin-bottom: 3rem;
+  border-top: 1px solid #cbd5e1;
+  padding-top: 1.5rem;
+  font-family: system-ui, sans-serif;
+}
+
+.transcriptMasteryTitle {
+  font-size: 1.05rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  color: #0f172a;
+}
+
+.signatureSection {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 3rem;
+  font-family: system-ui, sans-serif;
+  font-size: 0.9rem;
+}
+
+.sigBlock {
+  width: 250px;
+  text-align: center;
+}
+
+.sigLine {
+  border-bottom: 1px solid #0f172a;
+  margin-bottom: 6px;
+  height: 40px;
+}
+
+/* =========================================================
+   PRINT MEDIA RULES (Fires on window.print())
+   ========================================================= */
+@media print {
+  /* Hide non-printing controls */
+  .noPrint {
+    display: none !important;
+  }
+
+  :global(body) {
+    background: #ffffff !important;
+    color: #000000 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  :global(nav),
+  :global(aside) {
+    display: none !important;
+  }
+
+  .container {
+    max-width: 100% !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  .officialTranscript {
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
+  }
+}

@@ -33,7 +33,7 @@ export default function Calendar() {
         .select('*');
       
       if (data) {
-        setAssignments(data);
+        setAssignments(data.filter(t => t.status !== 'completed'));
       }
       setLoading(false);
     };
