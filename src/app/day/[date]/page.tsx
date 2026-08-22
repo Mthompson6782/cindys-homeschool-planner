@@ -373,6 +373,11 @@ export default function DailyPlanner({ params, searchParams }: { params: Promise
                 <p>{assignment.description}</p>
               </div>
               <div className={styles.assignmentActions}>
+                {assignment.title.toLowerCase().includes('intro to cs') && assignment.description.includes('Unit 1') && (
+                  <Link href="/courses/ai/week-1" className={styles.actionButton} style={{ background: 'var(--accent-primary)', color: 'white', border: 'none', textDecoration: 'none', display: 'flex', alignItems: 'center' }}>
+                    📖 Read Lesson
+                  </Link>
+                )}
                 <button className={styles.actionButton} onClick={() => completeTask(assignment.id!)}>Complete</button>
                 <button 
                   className={`${styles.actionButton} ${styles.bumpButton}`} 
