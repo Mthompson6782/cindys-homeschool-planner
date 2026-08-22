@@ -6,6 +6,55 @@ import { supabase, Task } from '@/lib/supabase';
 import { useUserPreferences, UserProfile } from '@/components/UserProvider';
 import styles from './Transcript.module.css';
 
+const COURSE_CATALOG: Record<string, { subject: string; description: string }> = {
+  "10th Grade English Literature": {
+    subject: "Language Arts / English",
+    description: "A comprehensive high school English literature survey exploring classic and modern works (Wells, Vonnegut, Poe, Adams, and Shakespeare's Macbeth). Emphasizes literary analysis, thematic deconstruction, vocabulary in context, and critical writing."
+  },
+  "Oak Meadow World History": {
+    subject: "Social Studies / History",
+    description: "A rigorous high school World History curriculum exploring global developments from 1450 CE to the modern era. Topics include the Age of Discovery, Atlantic Revolutions, Industrialization, Global Imperialism, the World Wars, Cold War geopolitics, and global sustainability."
+  },
+  "Easy Grammar Plus": {
+    subject: "Language Arts / Grammar",
+    description: "An intensive mastery-based study of English grammar and mechanics. Focuses on the prepositional approach to sentence structure, parts of speech, complex verb tenses, subject-verb agreement, punctuation rules, capitalization, and formal correspondence."
+  },
+  "ACT English Prep (The Official ACT English Guide)": {
+    subject: "Test Preparation & Applied English",
+    description: "Specialized standardized test preparation emphasizing grammar conventions, sentence structure, punctuation mastery, rhetorical skills, topic development, and timed strategy sets from official ACT practice exams."
+  },
+  "Pre-Algebra Curriculum Schedule": {
+    subject: "Mathematics",
+    description: "Foundational mathematics bridging arithmetic and algebraic reasoning. Covers operations with integers, rational numbers, multi-step linear equations, inequalities, ratios, proportions, percentage applications, and introductory coordinate geometry."
+  },
+  "Intro to CS: AI (Business & Real-World Focus)": {
+    subject: "STEM / Computer Science",
+    description: "An AI-first introduction to computer science aligned with Arkansas state standards. Covers traditional vs. machine learning algorithms, computational thinking, data privacy and cybersecurity, Python programming with AI APIs, and real-world business case studies."
+  }
+};
+
+function getCourseDetails(title: string) {
+  const match = Object.entries(COURSE_CATALOG).find(([key]) => 
+    title.toLowerCase().includes(key.toLowerCase()) || key.toLowerCase().includes(title.toLowerCase())
+  );
+  if (match) return match[1];
+
+  if (title.toLowerCase().includes("math") || title.toLowerCase().includes("algebra") || title.toLowerCase().includes("geometry")) {
+    return { subject: "Mathematics", description: "Comprehensive study of mathematical concepts, problem solving, and analytical reasoning." };
+  }
+  if (title.toLowerCase().includes("history") || title.toLowerCase().includes("social") || title.toLowerCase().includes("geography")) {
+    return { subject: "Social Studies", description: "In-depth historical inquiry, source analysis, and chronological study of civilizations and cultures." };
+  }
+  if (title.toLowerCase().includes("english") || title.toLowerCase().includes("literature") || title.toLowerCase().includes("grammar")) {
+    return { subject: "Language Arts", description: "Focus on reading comprehension, textual analysis, composition, and language mechanics." };
+  }
+  if (title.toLowerCase().includes("science") || title.toLowerCase().includes("cs") || title.toLowerCase().includes("ai") || title.toLowerCase().includes("coding")) {
+    return { subject: "Science & Technology", description: "Foundational concepts, scientific inquiry, computational thinking, and modern technology applications." };
+  }
+
+  return { subject: "Academic Elective", description: "Structured homeschool coursework focusing on core subject mastery, independent study, and practical application." };
+}
+
 export default function TranscriptPage() {
   const { activeUser, avatars } = useUserPreferences();
   const [selectedStudent, setSelectedStudent] = useState<string>(activeUser === 'admin' || activeUser === 'cindy' ? 'leo' : activeUser);
@@ -83,7 +132,7 @@ export default function TranscriptPage() {
           <div>
             <Link href="/" className={styles.backLink}>&larr; Back to Calendar</Link>
             <h1 className={styles.title}>📜 Grade Book &amp; Transcript</h1>
-            <p className={styles.subtitle}>Academic tracking, curriculum mastery records, and official transcript generation.</p>
+            <p className={styles.subtitle}>Academic tracking, curriculum course descriptions, and official transcript generation.</p>
           </div>
 
           <div className={styles.headerActions}>
@@ -154,7 +203,7 @@ export default function TranscriptPage() {
           </div>
 
           {/* Courses List */}
-          <h2 className={styles.sectionHeading}>Course Progress &amp; Grades</h2>
+          <h2 className={styles.sectionHeading}>Enrolled Courses, Descriptions &amp; Grades</h2>
           {loading ? (
             <div className={styles.loading}>Loading student records...</div>
           ) : courseCount === 0 ? (
@@ -167,14 +216,17 @@ export default function TranscriptPage() {
                 const courseKey = `${selectedStudent}_${courseTitle}`;
                 const currentGrade = grades[courseKey] || 'A';
                 const percent = data.total.length > 0 ? Math.round((data.completed.length / data.total.length) * 100) : 0;
+                const details = getCourseDetails(courseTitle);
 
                 return (
                   <div key={courseTitle} className={styles.courseCard}>
                     <div className={styles.courseHeader}>
                       <div>
+                        <div className={styles.subjectBadge}>{details.subject}</div>
                         <h3 className={styles.courseTitle}>{courseTitle}</h3>
+                        <p className={styles.courseDescription}>{details.description}</p>
                         <div className={styles.courseMeta}>
-                          {data.completed.length} of {data.total.length} lessons completed ({percent}%)
+                          📊 {data.completed.length} of {data.total.length} lessons completed ({percent}%)
                         </div>
                       </div>
                       
@@ -260,16 +312,16 @@ export default function TranscriptPage() {
             </div>
           </div>
 
-          {/* Official Course Table */}
+          {/* Official Course Table with Subject and Descriptions */}
           <table className={styles.transcriptTable}>
             <thead>
               <tr>
-                <th style={{ textAlign: 'left' }}>Course Title</th>
-                <th style={{ textAlign: 'center' }}>Scheduled Lessons</th>
-                <th style={{ textAlign: 'center' }}>Completed</th>
-                <th style={{ textAlign: 'center' }}>Progress</th>
-                <th style={{ textAlign: 'center' }}>Final Grade</th>
-                <th style={{ textAlign: 'center' }}>Status</th>
+                <th style={{ textAlign: 'left', width: '35%' }}>Course Title &amp; Department</th>
+                <th style={{ textAlign: 'center', width: '15%' }}>Lessons</th>
+                <th style={{ textAlign: 'center', width: '15%' }}>Completed</th>
+                <th style={{ textAlign: 'center', width: '15%' }}>Progress</th>
+                <th style={{ textAlign: 'center', width: '10%' }}>Grade</th>
+                <th style={{ textAlign: 'center', width: '10%' }}>Status</th>
               </tr>
             </thead>
             <tbody>
@@ -278,10 +330,14 @@ export default function TranscriptPage() {
                 const grade = grades[courseKey] || 'A';
                 const percent = data.total.length > 0 ? Math.round((data.completed.length / data.total.length) * 100) : 0;
                 const status = percent === 100 ? 'Completed' : 'In Progress';
+                const details = getCourseDetails(courseTitle);
 
                 return (
                   <tr key={courseTitle}>
-                    <td style={{ fontWeight: 600 }}>{courseTitle}</td>
+                    <td>
+                      <div style={{ fontWeight: 700, fontSize: '0.95rem' }}>{courseTitle}</div>
+                      <div style={{ fontSize: '0.75rem', color: '#64748b', textTransform: 'uppercase', fontWeight: 600 }}>{details.subject}</div>
+                    </td>
                     <td style={{ textAlign: 'center' }}>{data.total.length}</td>
                     <td style={{ textAlign: 'center' }}>{data.completed.length}</td>
                     <td style={{ textAlign: 'center' }}>{percent}%</td>
@@ -292,6 +348,25 @@ export default function TranscriptPage() {
               })}
             </tbody>
           </table>
+
+          {/* Detailed Course Descriptions & Scope */}
+          <div className={styles.transcriptMasterySection}>
+            <h3 className={styles.transcriptMasteryTitle}>Course Descriptions &amp; Academic Scope:</h3>
+            {Object.entries(coursesMap).map(([courseTitle]) => {
+              const details = getCourseDetails(courseTitle);
+              return (
+                <div key={courseTitle} style={{ marginBottom: '1rem' }}>
+                  <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px' }}>
+                    <strong style={{ fontSize: '0.95rem', color: '#0f172a' }}>{courseTitle}</strong>
+                    <span style={{ fontSize: '0.75rem', color: '#64748b', textTransform: 'uppercase', fontWeight: 600 }}>({details.subject})</span>
+                  </div>
+                  <p style={{ fontSize: '0.85rem', color: '#334155', margin: '0.25rem 0 0 0', lineHeight: 1.45 }}>
+                    {details.description}
+                  </p>
+                </div>
+              );
+            })}
+          </div>
 
           {/* Curriculum Mastery Overview */}
           <div className={styles.transcriptMasterySection}>
