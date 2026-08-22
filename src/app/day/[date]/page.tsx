@@ -374,7 +374,7 @@ export default function DailyPlanner({ params, searchParams }: { params: Promise
               </div>
               <div className={styles.assignmentActions}>
                 {(assignment.title?.toLowerCase().includes('intro to cs') || assignment.title?.toLowerCase().includes('ai')) && (assignment.description?.toLowerCase().includes('unit 1') || assignment.description?.toLowerCase().includes('week 1') || assignment.description?.toLowerCase().includes('traditional coding') || assignment.description?.toLowerCase().includes('hospital')) && (
-                  <Link href="/courses/ai/week-1" className={styles.actionButton} style={{ background: 'var(--accent-primary)', color: 'white', border: 'none', textDecoration: 'none', display: 'flex', alignItems: 'center' }}>
+                  <Link href="/courses/ai/week-1" className={`${styles.actionButton} ${styles.lessonButton}`}>
                     📖 Read Lesson
                   </Link>
                 )}
