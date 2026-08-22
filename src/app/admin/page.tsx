@@ -18,7 +18,7 @@ export default function AdminDashboard() {
     pattern: 'everyday',
   });
   
-  const [uploadedJson, setUploadedJson] = useState<any>(null);
+  const [uploadedSchedules, setUploadedSchedules] = useState<any[]>([]);
   
   const [singleTask, setSingleTask] = useState({
     user: 'cindy',
@@ -34,23 +34,54 @@ export default function AdminDashboard() {
 
   const [loading, setLoading] = useState(false);
 
-  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) {
-      setUploadedJson(null);
+      setUploadedSchedules([]);
       return;
     }
-    const reader = new FileReader();
-    reader.onload = (event) => {
+
+    if (file.name.endsWith('.zip')) {
       try {
-        const json = JSON.parse(event.target?.result as string);
-        setUploadedJson(json);
+        const JSZip = (await import('jszip')).default;
+        const zip = new JSZip();
+        const contents = await zip.loadAsync(file);
+        
+        const schedules = [];
+        for (const [filename, fileData] of Object.entries(contents.files)) {
+          if (!fileData.dir && filename.endsWith('.json')) {
+            const text = await fileData.async('text');
+            try {
+              schedules.push(JSON.parse(text));
+            } catch (err) {
+              console.error(`Invalid JSON in zip file: ${filename}`);
+            }
+          }
+        }
+        
+        if (schedules.length > 0) {
+          setUploadedSchedules(schedules);
+        } else {
+          alert("No valid JSON files found in the ZIP.");
+          setUploadedSchedules([]);
+        }
       } catch (err) {
-        alert("Invalid JSON file");
-        setUploadedJson(null);
+        alert("Error reading ZIP file");
+        setUploadedSchedules([]);
       }
-    };
-    reader.readAsText(file);
+    } else {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        try {
+          const json = JSON.parse(event.target?.result as string);
+          setUploadedSchedules([json]);
+        } catch (err) {
+          alert("Invalid JSON file");
+          setUploadedSchedules([]);
+        }
+      };
+      reader.readAsText(file);
+    }
   };
 
   const handleBulkGenerate = async (e: React.FormEvent) => {
@@ -59,41 +90,44 @@ export default function AdminDashboard() {
     
     const tasksToInsert = [];
     
-    if (uploadedJson) {
-      if (!uploadedJson.schedule || !Array.isArray(uploadedJson.schedule)) {
-        alert("The uploaded JSON doesn't contain a valid 'schedule' array. Please check the file format.");
-        setLoading(false);
-        return;
-      }
-      
-      for (const session of uploadedJson.schedule) {
-        const defaultTitle = uploadedJson.metadata?.title || uploadedJson.course || "Assignment";
-        const prefix = generatorState.textbook ? generatorState.textbook : defaultTitle;
-        const title = prefix;
-        
-        let desc = "";
-        // Support old format (array of lessons)
-        if (session.lessons && Array.isArray(session.lessons) && session.lessons.length > 0) {
-          desc = `Lessons: ${session.lessons.join(", ")}`;
-        } 
-        // Support new format (lesson and part strings)
-        else {
-          const parts = [];
-          if (session.lesson) parts.push(session.lesson);
-          if (session.part) parts.push(session.part);
-          if (session.topic) parts.push(`Topic: ${session.topic}`);
-          if (session.description) parts.push(session.description);
-          
-          desc = parts.join('\n');
+    if (uploadedSchedules.length > 0) {
+      for (const scheduleObj of uploadedSchedules) {
+        if (!scheduleObj.schedule || !Array.isArray(scheduleObj.schedule)) {
+          console.warn("Skipping invalid schedule object:", scheduleObj);
+          continue;
         }
         
-        tasksToInsert.push({
-          date: session.date,
-          time: "09:00",
-          title: title,
-          user: generatorState.user,
-          description: desc
-        });
+        for (const session of scheduleObj.schedule) {
+          const defaultTitle = scheduleObj.metadata?.title || scheduleObj.course || "Assignment";
+          const prefix = generatorState.textbook ? generatorState.textbook : defaultTitle;
+          const title = prefix;
+          
+          let desc = "";
+          if (session.lessons && Array.isArray(session.lessons) && session.lessons.length > 0) {
+            desc = `Lessons: ${session.lessons.join(", ")}`;
+          } else {
+            const parts = [];
+            if (session.lesson) parts.push(session.lesson);
+            if (session.part) parts.push(session.part);
+            if (session.topic) parts.push(`Topic: ${session.topic}`);
+            if (session.description) parts.push(session.description);
+            desc = parts.join('\n');
+          }
+          
+          tasksToInsert.push({
+            date: session.date,
+            time: "09:00",
+            title: title,
+            user: generatorState.user,
+            description: desc
+          });
+        }
+      }
+      
+      if (tasksToInsert.length === 0) {
+        alert("No valid tasks found in the uploaded file(s).");
+        setLoading(false);
+        return;
       }
     } else {
       let currentDate = parseISO(generatorState.startDate);
@@ -128,7 +162,7 @@ export default function AdminDashboard() {
       else {
         alert(`Successfully generated ${tasksToInsert.length} tasks!`);
         setGeneratorState({ ...generatorState, textbook: '', description: '' });
-        setUploadedJson(null);
+        setUploadedSchedules([]);
       }
     } else {
       alert("No valid dates found in that range for the selected pattern.");
@@ -271,13 +305,17 @@ export default function AdminDashboard() {
               </div>
               <input 
                 type="file" 
-                accept=".json,application/json,text/plain"
+                accept=".json,application/json,text/plain,.zip,application/zip"
                 className={styles.input} 
                 onChange={handleFileUpload}
                 onClick={(e) => { (e.target as HTMLInputElement).value = ''; }}
                 disabled={loading}
               />
-              {uploadedJson && <small style={{color: 'var(--accent-success)', marginTop: '0.5rem', display: 'block'}}>JSON Loaded: {uploadedJson.metadata?.title || uploadedJson.course || 'Ready to import'}. Other fields below will be ignored.</small>}
+              {uploadedSchedules.length > 0 && (
+                <small style={{color: 'var(--accent-success)', marginTop: '0.5rem', display: 'block'}}>
+                  Loaded {uploadedSchedules.length} schedule(s): {uploadedSchedules.map(s => s.metadata?.title || s.course).filter(Boolean).join(', ') || 'Ready to import'}. Other fields below will be ignored.
+                </small>
+              )}
             </div>
 
             <div className={styles.splitRow}>
@@ -300,7 +338,7 @@ export default function AdminDashboard() {
                   className={styles.select}
                   value={generatorState.pattern}
                   onChange={e => setGeneratorState({...generatorState, pattern: e.target.value})}
-                  disabled={loading || !!uploadedJson}
+                  disabled={loading || uploadedSchedules.length > 0}
                 >
                   <option value="everyday">Everyday (M-F)</option>
                   <option value="m_w">M/W</option>
@@ -315,10 +353,10 @@ export default function AdminDashboard() {
               <input 
                 type="text" 
                 className={styles.input} 
-                placeholder={uploadedJson ? "Optional subject prefix..." : "e.g. Japanese"}
+                placeholder={uploadedSchedules.length > 0 ? "Optional subject prefix..." : "e.g. Japanese"}
                 value={generatorState.textbook}
                 onChange={e => setGeneratorState({...generatorState, textbook: e.target.value})}
-                required={!uploadedJson}
+                required={uploadedSchedules.length === 0}
                 disabled={loading}
               />
             </div>
@@ -330,7 +368,7 @@ export default function AdminDashboard() {
                 placeholder="e.g. Study Hiragana..."
                 value={generatorState.description}
                 onChange={e => setGeneratorState({...generatorState, description: e.target.value})}
-                disabled={loading || !!uploadedJson}
+                disabled={loading || uploadedSchedules.length > 0}
               ></textarea>
             </div>
             
@@ -342,8 +380,8 @@ export default function AdminDashboard() {
                   className={styles.input} 
                   value={generatorState.startDate}
                   onChange={e => setGeneratorState({...generatorState, startDate: e.target.value})}
-                  required={!uploadedJson}
-                  disabled={loading || !!uploadedJson}
+                  required={uploadedSchedules.length === 0}
+                  disabled={loading || uploadedSchedules.length > 0}
                 />
               </div>
               <div className={styles.formGroup}>
@@ -353,8 +391,8 @@ export default function AdminDashboard() {
                   className={styles.input} 
                   value={generatorState.endDate}
                   onChange={e => setGeneratorState({...generatorState, endDate: e.target.value})}
-                  required={!uploadedJson}
-                  disabled={loading || !!uploadedJson}
+                  required={uploadedSchedules.length === 0}
+                  disabled={loading || uploadedSchedules.length > 0}
                 />
               </div>
             </div>
