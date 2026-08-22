@@ -52,7 +52,8 @@ export default function AdminDashboard() {
           if (!fileData.dir && filename.endsWith('.json')) {
             const text = await fileData.async('text');
             try {
-              schedules.push(JSON.parse(text));
+              const cleanText = text.replace(/^\uFEFF/, '').trim();
+              schedules.push(JSON.parse(cleanText));
             } catch (err) {
               console.error(`Invalid JSON in zip file: ${filename}`);
             }
@@ -73,7 +74,9 @@ export default function AdminDashboard() {
       const reader = new FileReader();
       reader.onload = (event) => {
         try {
-          const json = JSON.parse(event.target?.result as string);
+          const rawText = event.target?.result as string;
+          const cleanText = rawText.replace(/^\uFEFF/, '').trim();
+          const json = JSON.parse(cleanText);
           setUploadedSchedules([json]);
         } catch (err) {
           alert("Invalid JSON file");
